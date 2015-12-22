@@ -25,7 +25,7 @@
 
   <artifactId>mybatis</artifactId>
   <version>3.3.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
 
   <name>mybatis</name>
   <description>
@@ -137,7 +137,7 @@
       <groupId>ognl</groupId>
       <artifactId>ognl</artifactId>
       <version>3.0.11</version>
-      <scope>compile</scope>
+      <!--<scope>compile</scope>-->
       <optional>true</optional>
       <exclusions>
          <exclusion>
@@ -150,7 +150,7 @@
       <groupId>org.javassist</groupId>
       <artifactId>javassist</artifactId>
       <version>3.19.0-GA</version>
-      <scope>compile</scope>
+      <!--<scope>compile</scope>-->
       <optional>true</optional>
     </dependency>
     <dependency>
@@ -240,6 +240,11 @@
       <version>9.1-901-1.jdbc4</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.29</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -313,14 +318,14 @@
         <version>2.7</version>
         <configuration>
           <instrumentation>
-            <ignores>
-              <ignore>org.apache.ibatis.ognl.*</ignore>
-              <ignore>org.apache.ibatis.javassist.*</ignore>
-            </ignores>
-            <excludes>
-              <exclude>org/apache/ibatis/ognl/**/*.class</exclude>
-              <exclude>org/apache/ibatis/javassist/**/*.class</exclude>
-            </excludes>
+            <!--<ignores>-->
+              <!--<ignore>org.apache.ibatis.ognl.*</ignore>-->
+              <!--<ignore>org.apache.ibatis.javassist.*</ignore>-->
+            <!--</ignores>-->
+            <!--<excludes>-->
+              <!--<exclude>org/apache/ibatis/ognl/**/*.class</exclude>-->
+              <!--<exclude>org/apache/ibatis/javassist/**/*.class</exclude>-->
+            <!--</excludes>-->
           </instrumentation>
         </configuration>
         <executions>
