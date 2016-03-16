@@ -36,6 +36,9 @@ public class Student {
         this.email = email;
     }
 
+    public Student() {
+    }
+
     public int getId() {
         return id;
     }
