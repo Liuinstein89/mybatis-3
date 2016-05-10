@@ -1,0 +1,1 @@
+1、session.insert session 会把插入操作委托为 executor ，executor 会把这个操作委托给另外一个 executor ，executor 会构造出一个 statementHandler statementHandler 会构造出 statement ,executor 会使用 handler 对 statement 进行参数化。statementHandler 会把这个参数化操作交给 parameterHandler 来处理。

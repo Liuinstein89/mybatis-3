@@ -1,0 +1,1 @@
+TypeHandler 主要负责处理 PreparedStatement 中的参数设置和 query 结果集中某一列字段的获取。

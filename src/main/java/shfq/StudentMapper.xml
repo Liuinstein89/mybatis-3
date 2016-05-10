@@ -2,7 +2,7 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace = "Student">
-    <resultMap id = "result" type = "Student">
+    <resultMap id = "result" type = "shfq.Student">
         <result property = "id" column = "ID"/>
         <result property = "name" column = "NAME"/>
         <result property = "branch" column = "BRANCH"/>
@@ -19,7 +19,7 @@
     SELECT * FROM STUDENT WHERE ID = #{id};
     </select>
 
-    <insert id = "insert" parameterType = "Student">
+    <insert id = "insert" parameterType = "shfq.Student">
         INSERT INTO STUDENT (NAME, BRANCH, PERCENTAGE, PHONE, EMAIL ) VALUES (#{name}, #{branch}, #{percentage}, #{phone}, #{email});
 
         <selectKey keyProperty = "id" resultType = "int" order = "AFTER">

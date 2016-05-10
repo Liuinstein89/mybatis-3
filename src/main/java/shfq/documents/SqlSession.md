@@ -1,0 +1,1 @@
+主要负责与数据库打交道，insert 、update 、query 等。SqlSession 有一个 Executor ，具体的 insert 是由 Executor 来进行的。

@@ -22,6 +22,10 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * author:      shfq
@@ -29,10 +33,15 @@ import java.io.Reader;
  */
 public class Test {
     public static void main(String[] args) {
+
+        try {
 //        testQuery();
-        String regex = "(the)\\1";
-        String s = "thethe";
-        System.out.println(s.matches(regex));
+        testInsert();
+//
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     public static void testInsert() {
@@ -65,6 +74,22 @@ public class Test {
             session.commit();
             session.close();
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void test() {
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://192.168.0.78:3306/shfqtest", "root", "123456");
+            PreparedStatement statement = connection.prepareStatement("insert student VALUES (?, ?, ?, ?)");
+            System.out.println(statement.toString());
+            statement.setInt(1, 2000);
+            statement.setString(2, "shfq");
+            statement.setInt(3, 28);
+            statement.setFloat(4, 175);
+            int i = statement.executeUpdate();
+            System.out.println(i);
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
