@@ -35,9 +35,8 @@ public class Test {
     public static void main(String[] args) {
 
         try {
-//        testQuery();
-        testInsert();
-//
+        testQuery();
+//        testInsert();
         } catch (Exception e) {
             e.printStackTrace();
         }

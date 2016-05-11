@@ -35,6 +35,7 @@ resultSetType 在 insert 的时候 resultSetType 为 null ，resultSetType 会�
 sqlSource 代表了最原始的 sql 语句，应该是在解析 xml 的时候生成的，在本例子中 sqlSource 的值为 INSERT INTO STUDENT (NAME, BRANCH, PERCENTAGE, PHONE, EMAIL ) VALUES (?, ?, ?, ?, ?);
 cache 缓存，具体的工作原理不清楚
 
+resultMaps 用于查询
 
 
 
