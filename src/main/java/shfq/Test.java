@@ -35,8 +35,9 @@ public class Test {
     public static void main(String[] args) {
 
         try {
-        testQuery();
+//        testQuery();
 //        testInsert();
+            queryByMapper();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -91,6 +92,26 @@ public class Test {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void queryByMapper() {
+        SqlSession session = null;
+        try {
+            Reader reader = Resources.getResourceAsReader("shfq/mybatis-config.xml");
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+            session = sqlSessionFactory.openSession();
+            StudentMapper mapper = session.getMapper(StudentMapper.class);
+            Student student = mapper.selectStudent(20);
+            System.out.println("");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+
     }
 
 }
