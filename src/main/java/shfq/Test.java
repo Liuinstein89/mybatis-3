@@ -35,9 +35,9 @@ public class Test {
     public static void main(String[] args) {
 
         try {
-//        testQuery();
+        testQuery();
 //        testInsert();
-            queryByMapper();
+//            queryByMapper();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -69,7 +69,7 @@ public class Test {
             SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
             SqlSession session = sqlSessionFactory.openSession();
             // query student data
-            Student student = session.selectOne("Student.getById", 10);
+            Student student = session.selectOne("Student.getById", 9);
             System.out.println("record queried successfully");
             session.commit();
             session.close();

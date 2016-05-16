@@ -26,6 +26,7 @@ public class Student {
     private int percentage;
     private int phone;
     private String email;
+    private Address address;
 
     public Student(String name, String branch, int percentage, int phone, String email) {
         super();
@@ -85,5 +86,13 @@ public class Student {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
     }
 }
