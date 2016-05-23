@@ -1,17 +1,17 @@
 /**
- * Copyright 2009-2015 the original author or authors.
- * <p/>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p/>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *    Copyright 2009-2015 the original author or authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 package shfq;
 
@@ -26,6 +26,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * author:      shfq
@@ -33,11 +34,9 @@ import java.sql.SQLException;
  */
 public class Test {
     public static void main(String[] args) {
-
         try {
-        testQuery();
-//        testInsert();
-//            queryByMapper();
+            queryAllStudents();
+//            testQuery();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -112,6 +111,66 @@ public class Test {
             }
         }
 
+    }
+
+    private static void deleteById() {
+        SqlSession session = null;
+        try {
+            Reader reader = Resources.getResourceAsReader("shfq/mybatis-config.xml");
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+            session = sqlSessionFactory.openSession();
+            int count = session.delete("Student.deleteStudentById", 9);
+            System.out.println(count + " record was deleted");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+
+    }
+    private static void update() {
+        SqlSession session = null;
+        try {
+            Student student = new Student();
+            student.setId(9);
+            student.setName("shfq");
+            student.setEmail("shanbeirenshfq@163.com");
+
+            Reader reader = Resources.getResourceAsReader("shfq/mybatis-config.xml");
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+            session = sqlSessionFactory.openSession();
+            int count = session.update("Student.updateStudent", student);
+            System.out.println(count + " record was updated");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+
+    }
+
+    private static void queryAllStudents() {
+        SqlSession session = null;
+        try {
+            Reader reader = Resources.getResourceAsReader("shfq/mybatis-config.xml");
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+            session = sqlSessionFactory.openSession();
+            List<Student> students = session.selectList("Student.getAll");
+            System.out.println(students.size() + " record was got");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
     }
 
 }

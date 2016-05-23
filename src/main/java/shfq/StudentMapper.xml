@@ -13,13 +13,24 @@
 
     </resultMap>
 
+    <resultMap id = "studentResult" type = "shfq.Student">
+        <result property = "id" column = "student_ID"/>
+        <result property = "name" column = "student_NAME"/>
+        <result property = "branch" column = "student_BRANCH"/>
+        <result property = "percentage" column = "student_PERCENTAGE"/>
+        <result property = "phone" column = "student_PHONE"/>
+        <result property = "email" column = "student_EMAIL"/>
+
+    </resultMap>
+
+
     <resultMap id="address" type="shfq.Address">
         <result property="id" column="address_id"></result>
         <result property="name" column="address_name"></result>
         <result property="postCode" column="address_post_code"></result>
     </resultMap>
 
-    <select id = "getAll" resultMap = "result">
+    <select id = "getAll" resultMap = "studentResult">
     SELECT * FROM STUDENT;
     </select>
 
@@ -37,4 +48,10 @@
         </selectKey>
 
     </insert>
+    <delete id="deleteStudentById" parameterType="int">
+        DELETE FROM student where id=#{id}
+    </delete>
+    <update id="updateStudent" parameterType="shfq.Student">
+        UPDATE student SET name=#{name}, email=#{email} WHERE id=#{id}
+    </update>
 </mapper>
