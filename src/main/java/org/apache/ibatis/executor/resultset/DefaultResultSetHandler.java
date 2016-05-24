@@ -405,7 +405,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     }
   }
 
-  // todo
+  // todo 给对象设置所有的属性值
   private boolean applyAutomaticMappings(ResultSetWrapper rsw, ResultMap resultMap, MetaObject metaObject, String columnPrefix) throws SQLException {
     final List<String> unmappedColumnNames = rsw.getUnmappedColumnNames(resultMap, columnPrefix);
     boolean foundValues = false;
@@ -429,6 +429,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
           // issue #377, call setter on nulls
           if (value != null || configuration.isCallSettersOnNulls()) {
             if (value != null || !propertyType.isPrimitive()) {
+              // todo 设置对象的一个属性值
               metaObject.setValue(property, value);
             }
             foundValues = true;
