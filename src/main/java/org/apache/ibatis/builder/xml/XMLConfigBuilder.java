@@ -15,12 +15,6 @@
  */
 package org.apache.ibatis.builder.xml;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
 import org.apache.ibatis.builder.BaseBuilder;
 import org.apache.ibatis.builder.BuilderException;
 import org.apache.ibatis.datasource.DataSourceFactory;
@@ -43,6 +37,11 @@ import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.LocalCacheScope;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.type.JdbcType;
+
+import javax.sql.DataSource;
+import java.io.InputStream;
+import java.io.Reader;
+import java.util.Properties;
 
 /**
  * @author Clinton Begin
@@ -322,9 +321,10 @@ public class XMLConfigBuilder extends BaseBuilder {
       }
     }
   }
-
+  // todo 解析 config 文件中的 <mappers> 标签
   private void mapperElement(XNode parent) throws Exception {
     if (parent != null) {
+      // todo 循环解析 <mapper> 标签
       for (XNode child : parent.getChildren()) {
         if ("package".equals(child.getName())) {
           String mapperPackage = child.getStringAttribute("name");

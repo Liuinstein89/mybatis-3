@@ -40,7 +40,6 @@ public class Test {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     public static void testInsert() {

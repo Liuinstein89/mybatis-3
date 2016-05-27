@@ -31,7 +31,7 @@ column 对应着 <result> 标签中的 column 属性，在本例中 column 的�
 javaType 其实 <result> 标签中还有几个省略的属性，这几个属性是 javaType,jdbcType,typeHandler  <result property = "id" column = "ID" javaType="" jdbcType="" typeHandler=""/>，如果在 <result> 中指定了 javaType ，那么 javaType 就是指定的值，如果没指定的话就是 VO 对象的字段的类型，在本例中是 Student 对象中的 id 字段的类型，id 字段的类型是 int 。
 jdbcType 对应着 <result> 标签中的 jdbcType 属性，不过 jdbcType 可以省略，如果没有省略的话指定什么就是什么，如果省略了的话就为 null 
 typeHandler 暂时未知
-nestedResultMapId
+nestedResultMapId 如果 <resultMap> 中有 <association> 标签则表明是嵌套 resultMap
 nestedQueryId
 notNullColumns
 columnPrefix

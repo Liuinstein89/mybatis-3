@@ -15,16 +15,12 @@
  */
 package org.apache.ibatis.parsing;
 
+import org.w3c.dom.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import org.w3c.dom.CharacterData;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * @author Clinton Begin
@@ -32,6 +28,7 @@ import org.w3c.dom.NodeList;
 public class XNode {
 
   private Node node;
+  // todo 标签的名称 例如：<result> 标签的 name 就是 result
   private String name;
   private String body;
   private Properties attributes;
