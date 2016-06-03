@@ -1,0 +1,63 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "insertStudent">
+    <resultMap id = "result" type = "shfq.Student">
+        <result property = "id" column = "student_ID"/>
+        <result property = "name" column = "student_NAME"/>
+        <result property = "branch" column = "student_BRANCH"/>
+        <result property = "percentage" column = "student_PERCENTAGE"/>
+        <result property = "phone" column = "student_PHONE"/>
+        <result property = "email" column = "student_EMAIL"/>
+        <association property="address" resultMap="address"/>
+
+    </resultMap>
+
+    <resultMap id = "studentResult" type = "shfq.Student">
+        <result property = "id" column = "student_ID"/>
+        <result property = "name" column = "student_NAME"/>
+        <result property = "branch" column = "student_BRANCH"/>
+        <result property = "percentage" column = "student_PERCENTAGE"/>
+        <result property = "phone" column = "student_PHONE"/>
+        <result property = "email" column = "student_EMAIL"/>
+
+    </resultMap>
+
+
+    <resultMap id="address" type="shfq.Address">
+        <result property="id" column="address_id"></result>
+        <result property="name" column="address_name"></result>
+        <result property="postCode" column="address_post_code"></result>
+    </resultMap>
+
+    <select id = "getAll" useCache="true" flushCache="true" resultMap = "studentResult">
+    SELECT * FROM STUDENT;
+    </select>
+
+    <select id = "getById" parameterType = "int" resultMap = "result">
+      select s.id as student_id, s.name as student_name, s.branch as student_branch, s.percentage as student_percentage, s.phone as student_phone, s.email as student_email,
+	      a.id as address_id, a.name as address_name, a.post_code as address_post_code
+      from student s left outer join address a on s.address_id=a.id where s.id=#{id}
+    </select>
+
+    <insert id = "insert" parameterType = "shfq.Student">
+        INSERT INTO STUDENT (NAME, BRANCH, PERCENTAGE, PHONE, EMAIL ) VALUES (#{name}, #{branch}, #{percentage}, #{phone}, #{email});
+
+        <selectKey keyProperty = "id" resultType = "int" order = "AFTER">
+            select last_insert_id() as id
+        </selectKey>
+
+    </insert>
+    <delete id="deleteStudentById" parameterType="int">
+        DELETE FROM student where id=#{id}
+    </delete>
+    <update id="updateStudent" parameterType="shfq.Student">
+        UPDATE student
+          <set>
+              <if test="name != null">name=#{name}</if>
+              <if test="email != null">email=#{email}</if>
+          </set>
+            WHERE id=#{id}
+
+    </update>
+</mapper>

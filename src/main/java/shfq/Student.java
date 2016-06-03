@@ -19,7 +19,7 @@ package shfq;
  * author:      shfq
  * create date: 2015/12/22.
  */
-public class Student {
+public class Student{
     private int id;
     private String name;
     private String branch;

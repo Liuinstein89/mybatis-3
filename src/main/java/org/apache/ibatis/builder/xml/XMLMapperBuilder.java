@@ -86,6 +86,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     return sqlFragments.get(refid);
   }
 
+  // todo 解析一个 <mapper>
   private void configurationElement(XNode context) {
     try {
       String namespace = context.getStringAttribute("namespace");

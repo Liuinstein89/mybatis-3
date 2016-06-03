@@ -1,7 +1,7 @@
 <?xml version = "1.0" encoding = "UTF-8"?>
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace = "Student">
+<mapper namespace = "queryStudent">
     <resultMap id = "result" type = "shfq.Student">
         <result property = "id" column = "student_ID"/>
         <result property = "name" column = "student_NAME"/>
@@ -30,7 +30,7 @@
         <result property="postCode" column="address_post_code"></result>
     </resultMap>
 
-    <select id = "getAll" resultMap = "studentResult">
+    <select id = "getAll" useCache="true" flushCache="true" resultMap = "studentResult">
     SELECT * FROM STUDENT;
     </select>
 
@@ -52,6 +52,12 @@
         DELETE FROM student where id=#{id}
     </delete>
     <update id="updateStudent" parameterType="shfq.Student">
-        UPDATE student SET name=#{name}, email=#{email} WHERE id=#{id}
+        UPDATE student
+          <set>
+              <if test="name != null">name=#{name}</if>
+              <if test="email != null">email=#{email}</if>
+          </set>
+            WHERE id=#{id}
+
     </update>
 </mapper>

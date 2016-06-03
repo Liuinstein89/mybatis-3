@@ -15,12 +15,14 @@
  */
 package shfq;
 
+import java.io.Serializable;
+
 /**
  * author:      shfq
  * description:
  * create date: 2016/5/16.
  */
-public class Address {
+public class Address implements Serializable {
     private int id;
     private String name;
     private String postCode;

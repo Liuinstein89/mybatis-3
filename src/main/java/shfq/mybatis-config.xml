@@ -25,7 +25,6 @@
         </environment>
     </environments>
     <mappers>
-        <mapper resource="shfq/StudentMapper.xml"/>
-        <mapper class="shfq.StudentMapper"/>
+        <mapper resource="shfq/mappers/StudentUpdateMapper.xml"/>
     </mappers>
 </configuration>

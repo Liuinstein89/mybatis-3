@@ -26,6 +26,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -34,11 +35,17 @@ import java.util.List;
  */
 public class Test {
     public static void main(String[] args) {
-        try {
-            queryAllStudents();
-//            testQuery();
-        } catch (Exception e) {
-            e.printStackTrace();
+//        try {
+//            update();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+        Integer[] ints =  { 6, 10, 13, 5, 8, 3, 2, 11 };
+        List<Integer> list = Arrays.asList(ints);
+        quickSort(list, 0, list.size());
+        for (int value : list) {
+            System.out.println(value);
+            System.out.println("");
         }
     }
 
@@ -134,14 +141,14 @@ public class Test {
         SqlSession session = null;
         try {
             Student student = new Student();
-            student.setId(9);
-            student.setName("shfq");
+            student.setId(10);
+//            student.setName("shfq");
             student.setEmail("shanbeirenshfq@163.com");
 
             Reader reader = Resources.getResourceAsReader("shfq/mybatis-config.xml");
             SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
             session = sqlSessionFactory.openSession();
-            int count = session.update("Student.updateStudent", student);
+            int count = session.update("updateStudent.updateStudent", student);
             System.out.println(count + " record was updated");
 
         } catch (IOException e) {
@@ -154,7 +161,7 @@ public class Test {
 
     }
 
-    private static void queryAllStudents() {
+    private static List<Student> queryAllStudents() {
         SqlSession session = null;
         try {
             Reader reader = Resources.getResourceAsReader("shfq/mybatis-config.xml");
@@ -162,14 +169,63 @@ public class Test {
             session = sqlSessionFactory.openSession();
             List<Student> students = session.selectList("Student.getAll");
             System.out.println(students.size() + " record was got");
-
+            List<Student> students1 = session.selectList("Student.getAll");
+            System.out.println(students == students1);
+            for (int i = 0; i < students.size(); i++) {
+                System.out.println(students.get(i) == students1.get(i));
+            }
+            return students;
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         } finally {
             if (session != null) {
                 session.close();
             }
         }
     }
+
+    private static void quickSort(List<Integer> integers, int leftBoundary, int rightBoundary) {
+        if ((rightBoundary - leftBoundary) <= 1) {
+            return;
+        }
+        int pivotIndex = partition(integers, leftBoundary, rightBoundary, (leftBoundary + rightBoundary) / 2);
+        quickSort(integers, leftBoundary, pivotIndex);
+        quickSort(integers, pivotIndex + 1, rightBoundary);
+    }
+
+    private static int partition(List<Integer> integers, int leftBoundary, int rightBoundary, int pivotIndex) {
+        // ordered
+        if (rightBoundary - leftBoundary <= 1) {
+            return -1;
+        }
+        swap(integers, leftBoundary, pivotIndex);
+        int pivotValue = integers.get(leftBoundary);
+        int boundary = leftBoundary + 1;
+        for (int i = 0; i < rightBoundary - leftBoundary - 1; i++) {
+            int current = i + 1 + leftBoundary;
+            if (integers.get(current) < pivotValue) {
+                swap(integers, current, boundary);
+                boundary = boundary + 1;
+            }
+        }
+        swap(integers, leftBoundary, boundary - 1);
+
+
+        return boundary-1;
+    }
+
+    private static void swap(List<Integer> integers, int index1, int index2) {
+        if (integers == null || integers.size() == 1) {
+            return;
+        }
+        if (index1 < 0 || index2 < 0 || index1 >= integers.size() || index2 >= integers.size()) {
+            return;
+        }
+        int temp = integers.get(index1);
+        integers.set(index1, integers.get(index2));
+        integers.set(index2, temp);
+    }
+
 
 }
