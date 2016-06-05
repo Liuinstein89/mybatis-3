@@ -10,10 +10,10 @@ import java.util.List;
  */
 public class Test1 {
     public static void main(String[] args) {
-        Integer[] integers = {3, 5, 7, 9, 11};
+        Integer[] integers = {3, 5, 7, 9};
         List<Integer> integerList = Arrays.asList(integers);
-        System.out.println(binarySearch(integerList, 0, integerList.size(), 8));
-
+        int index = loopBinarySearch(integerList, 19);
+        System.out.println(index);
     }
 
     //    private static int binarySearch(List<Integer> integers, int leftBoundary, int rightBoundary, int targetValue) {
@@ -39,20 +39,20 @@ public class Test1 {
      * @param targetValue 待查找的元素的值
      * @return 返回待查找的元素的索引值，如果待查找的元素不在数组中的话则返回 -1
      */
-    private static int binarySearch(List<Integer> integers, int leftBoundary, int rightBoundary, int targetValue) {
-        if (leftBoundary == integers.size() || rightBoundary == -1) {
-            return -1;
-        }
-        int middleIndex = leftBoundary + (rightBoundary - leftBoundary) / 2;
-        int middleValue = integers.get(middleIndex);
-        if (targetValue == middleValue) {
-            return middleIndex;
-        } else if (targetValue < middleValue) {
-            return binarySearch(integers, leftBoundary, middleIndex - 1, targetValue);
-        } else {
-            return binarySearch(integers, middleIndex + 1, rightBoundary, targetValue);
-        }
-    }
+//    private static int binarySearch(List<Integer> integers, int leftBoundary, int rightBoundary, int targetValue) {
+//        if (leftBoundary - rightBoundary == 1) {
+//            return -1;
+//        }
+//        int middleIndex = leftBoundary + (rightBoundary - leftBoundary) / 2;
+//        int middleValue = integers.get(middleIndex);
+//        if (targetValue == middleValue) {
+//            return middleIndex;
+//        } else if (targetValue < middleValue) {
+//            return binarySearch(integers, leftBoundary, middleIndex - 1, targetValue);
+//        } else {
+//            return binarySearch(integers, middleIndex + 1, rightBoundary, targetValue);
+//        }
+//    }
 //
 
 //        private static int binarySearch(List<Integer> integers, int leftBoundary, int rightBoundary, int targetValue) {
@@ -72,34 +72,33 @@ public class Test1 {
 
     /**
      * 循环二分查找
-     * @param integers 待查找的数组或列表
+     *
+     * @param integers    待查找的数组或列表
      * @param targetValue 待查找的元素的值
      * @return 返回待查找的元素的索引值，如果待查找的元素不在数组中的话则返回 -1
      */
-//    private static int loopBinarySearch(List<Integer> integers, int targetValue) {
-//        if (integers == null) {
-//            return -1;
-//        }
-//
-//        int leftBoundary = 0;
-//        int rightBoundary = integers.size();
-//
-//        while (!(leftBoundary == integers.size() || rightBoundary == -1)) {
-//            int middleIndex = leftBoundary + (rightBoundary - leftBoundary) / 2;
-//            int middleValue = integers.get(middleIndex);
-//            if (targetValue == middleValue) {
-//                return middleIndex;
-//            } else if (targetValue < middleValue) {
-//                rightBoundary = middleIndex - 1;
-//            } else {
-//                leftBoundary = middleIndex + 1;
-//            }
-//        }
-//
-//        return -1;
-//    }
+    private static int loopBinarySearch(List<Integer> integers, int targetValue) {
+        if (integers == null) {
+            return -1;
+        }
 
+        int leftBoundary = 0;
+        int rightBoundary = integers.size() - 1;
 
+        while (rightBoundary - leftBoundary >= 0) {
+            int middleIndex = leftBoundary + (rightBoundary - leftBoundary) / 2;
+            int middleValue = integers.get(middleIndex);
+            if (targetValue == middleValue) {
+                return middleIndex;
+            } else if (targetValue < middleValue) {
+                rightBoundary = middleIndex - 1;
+            } else {
+                leftBoundary = middleIndex + 1;
+            }
+        }
+
+        return -1;
+    }
 
 
 }
