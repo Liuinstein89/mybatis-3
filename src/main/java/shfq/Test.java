@@ -42,7 +42,7 @@ public class Test {
 //        }
         Integer[] ints =  { 6, 10, 13, 5, 8, 3, 2, 11 };
         List<Integer> list = Arrays.asList(ints);
-        quickSort(list, 0, list.size());
+        quickSort(list, 0, list.size()-1);
         for (int value : list) {
             System.out.println(value);
             System.out.println("");
@@ -186,23 +186,19 @@ public class Test {
     }
 
     private static void quickSort(List<Integer> integers, int leftBoundary, int rightBoundary) {
-        if ((rightBoundary - leftBoundary) <= 1) {
+        if ((rightBoundary - leftBoundary) == 0 || (rightBoundary - leftBoundary) == -1) {
             return;
         }
         int pivotIndex = partition(integers, leftBoundary, rightBoundary, (leftBoundary + rightBoundary) / 2);
-        quickSort(integers, leftBoundary, pivotIndex);
+        quickSort(integers, leftBoundary, pivotIndex-1);
         quickSort(integers, pivotIndex + 1, rightBoundary);
     }
 
     private static int partition(List<Integer> integers, int leftBoundary, int rightBoundary, int pivotIndex) {
-        // ordered
-        if (rightBoundary - leftBoundary <= 1) {
-            return -1;
-        }
         swap(integers, leftBoundary, pivotIndex);
         int pivotValue = integers.get(leftBoundary);
         int boundary = leftBoundary + 1;
-        for (int i = 0; i < rightBoundary - leftBoundary - 1; i++) {
+        for (int i = 0; i < rightBoundary - leftBoundary; i++) {
             int current = i + 1 + leftBoundary;
             if (integers.get(current) < pivotValue) {
                 swap(integers, current, boundary);
