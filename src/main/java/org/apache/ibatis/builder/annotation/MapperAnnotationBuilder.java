@@ -347,6 +347,7 @@ public class MapperAnnotationBuilder {
     return assistant.getLanguageDriver(langClass);
   }
 
+  // todo 如果有一个参数（不是 RowBounds 也不是 ResultHandler 或者其子类的类）则返回这个参数的类型，如果有多个参数则返回 ParamMap 类型
   private Class<?> getParameterType(Method method) {
     Class<?> parameterType = null;
     Class<?>[] parameterTypes = method.getParameterTypes();
