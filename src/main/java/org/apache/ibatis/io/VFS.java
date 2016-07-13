@@ -61,6 +61,7 @@ public abstract class VFS {
 
     // Try each implementation class until a valid one is found
     VFS vfs = null;
+    // todo vfs 会不会死循环
     for (int i = 0; vfs == null || !vfs.isValid(); i++) {
       Class<? extends VFS> impl = impls.get(i);
       try {

@@ -6,12 +6,17 @@
     <properties>
         <property name="username" value="root"/>
         <property name="password" value="123456"/>
+        <property name="test" value=""></property>
+        <property name="" value=""></property>
     </properties>
     <settings>
         <setting name="mapUnderscoreToCamelCase" value="true"/>
     </settings>
     <typeAliases>
         <typeAlias alias = "Student" type = "shfq.Student"/>
+        <typeAlias alias = "" type = "shfq.Cat"/>
+        <typeAlias type = "shfq.Dog"/>
+        <package name="shfq.vo"/>
     </typeAliases>
     <environments default="development">
         <environment id="development">
@@ -25,6 +30,7 @@
         </environment>
     </environments>
     <mappers>
-        <mapper resource="shfq/mappers/StudentUpdateMapper.xml"/>
+        <!--<mapper resource="shfq/mappers/StudentUpdateMapper.xml"/>-->
+        <mapper class="shfq.StudentMapperTest"></mapper>
     </mappers>
 </configuration>
