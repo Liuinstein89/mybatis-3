@@ -35,18 +35,7 @@ import java.util.List;
  */
 public class Test {
     public static void main(String[] args) {
-//        try {
-//            update();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-        Integer[] ints =  { 6, 10, 13, 5, 8, 3, 2, 11 };
-        List<Integer> list = Arrays.asList(ints);
-        quickSort(list, 0, list.size()-1);
-        for (int value : list) {
-            System.out.println(value);
-            System.out.println("");
-        }
+        queryByMapper();
     }
 
     public static void testInsert() {

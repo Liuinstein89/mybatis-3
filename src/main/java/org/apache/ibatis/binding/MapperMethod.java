@@ -215,14 +215,21 @@ public class MapperMethod {
 
   public static class MethodSignature {
 
+    // 返回是数组或 list 或 数组 但不是 map
     private final boolean returnsMany;
+    // 返回是 map
     private final boolean returnsMap;
     private final boolean returnsVoid;
     private final Class<?> returnType;
+    // mybatis 可以返回 List 也可以返回 Map 返回 Map 是需要指定 key 值，mapKey 就是 key 值。
+    // 在 方法上可以加 MapKey 注解， mapKey 就是其注解值
     private final String mapKey;
     private final Integer resultHandlerIndex;
     private final Integer rowBoundsIndex;
+    // key 为参数在方法中出现的顺序从 0 开始，如果有 Param 类型的注解，则 value 为注解的值，如果没有的话，value 则是该参数被添加到 map 时的顺序，从 0 开始。
+    // 但这些参数中不包含 RowBounds 和 ResultHandler
     private final SortedMap<Integer, String> params;
+    // 方法的参数上可以加注解，注解的类型如果是 Param 的话则为真
     private final boolean hasNamedParameters;
 
     public MethodSignature(Configuration configuration, Method method) {
