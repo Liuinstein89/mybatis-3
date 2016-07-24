@@ -15,7 +15,11 @@
  */
 package shfq;
 
+import org.apache.ibatis.annotations.MapKey;
+import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.Map;
 
 /**
  * author:      shfq
@@ -25,4 +29,7 @@ import org.apache.ibatis.annotations.Select;
 public interface StudentMapper {
     @Select("SELECT * FROM student WHERE id=#{id}")
     Student selectStudent(int id);
+    @MapKey("id")
+    @Select({"SELECT * FROM student WHERE id=#{id}"})
+    Map<Integer, Student> selectStudentMap(int id);
 }

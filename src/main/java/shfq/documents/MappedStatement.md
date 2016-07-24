@@ -1,4 +1,4 @@
-MappedStatement 是对 <insert> xml 的封装。
+MappedStatement 是对 <insert> xml 的封装（也是对 Mapper 接口中的方法的封装）。
 
 
   private String resource;
@@ -25,9 +25,10 @@ MappedStatement 是对 <insert> xml 的封装。
   private LanguageDriver lang;
   private String[] resultSets;
 
-resource 表示的是 <insert> 所在 xml 的全名称。
+resource 表示的是 <insert> 所在 xml 的全名称。/方法所在的接口的全称
+
 configuration 代表的是 mybatis-config.xml 总的配置文件。
-id 代表的是 <insert> 标签中的 id 属性 。
+id 代表的是 <insert> 标签中的 id 属性 。/包名.类名.方法名
 fetchSize 代表的是该语句需要返回的结果集中记录的最大值。
 timeout 设置的是该语句的超时时间。
 statementType 有三种取值分别为：STATEMENT 、PREPARED 、CALLABLE ，应该是在解析 xml 文件的时候确定的 statementType 。如果在 <insert> 标签中有 # 符号的时候就表示的是 PREPARED 。

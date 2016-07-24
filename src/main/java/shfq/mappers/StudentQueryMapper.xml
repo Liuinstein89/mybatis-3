@@ -30,9 +30,13 @@
         <result property="postCode" column="address_post_code"></result>
     </resultMap>
 
-    <select id = "getAll" useCache="true" flushCache="true" resultMap = "studentResult">
-    SELECT * FROM STUDENT;
+    <select id = "getAll" resultType="shfq.Student">
+    SELECT id, name, phone, email FROM STUDENT;
     </select>
+
+    <!--<select id = "getAll" useCache="true" flushCache="true" resultMap = "studentResult">-->
+    <!--SELECT * FROM STUDENT;-->
+    <!--</select>-->
 
     <select id = "getById" parameterType = "int" resultMap = "result">
       select s.id as student_id, s.name as student_name, s.branch as student_branch, s.percentage as student_percentage, s.phone as student_phone, s.email as student_email,

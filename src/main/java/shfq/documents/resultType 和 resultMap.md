@@ -1,0 +1,6 @@
+- resultType 的值是一个类名
+- resultMap 代表的是一个 <resultMap/>
+- 简单的返回值可以用 resultType ，根据 resultType 的属性名称来映射。
+- 复杂的可以用 resultMap 来映射。
+- 用 resultType 时列名和属性名不匹配时可以用 xx as yy 来解决
+- 也可以用 resultMap 来解决列名和属性名不匹配的问题。

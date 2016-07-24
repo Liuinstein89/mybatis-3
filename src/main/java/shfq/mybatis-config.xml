@@ -23,6 +23,7 @@
     <properties>
         <property name="username" value="root"/>
         <property name="password" value="123456"/>
+        <property name="studentId" value="1"/>
     </properties>
     <settings>
         <setting name="mapUnderscoreToCamelCase" value="true"/>
@@ -42,7 +43,8 @@
         </environment>
     </environments>
     <mappers>
+        <mapper resource="shfq/mappers/StudentQueryMapper.xml"/>
         <!--<mapper resource="shfq/mappers/StudentUpdateMapper.xml"/>-->
-        <mapper class="shfq.StudentMapper"></mapper>
+        <!--<mapper class="shfq.StudentMapper"></mapper>-->
     </mappers>
 </configuration>

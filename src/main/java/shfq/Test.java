@@ -35,7 +35,8 @@ import java.util.List;
  */
 public class Test {
     public static void main(String[] args) {
-        queryByMapper();
+//        queryByMapper();
+        testQuery();
     }
 
     public static void testInsert() {
@@ -63,7 +64,7 @@ public class Test {
             SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
             SqlSession session = sqlSessionFactory.openSession();
             // query student data
-            Student student = session.selectOne("Student.getById", 9);
+            Object student = session.selectList("getAll");
             System.out.println("record queried successfully");
             session.commit();
             session.close();
