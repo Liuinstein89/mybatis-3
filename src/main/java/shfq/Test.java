@@ -34,8 +34,8 @@ import java.util.List;
  */
 public class Test {
     public static void main(String[] args) {
-//        queryByMapper();
-        testQuery();
+        queryByMapper();
+//        testQuery();
     }
 
     public static void testInsert() {
