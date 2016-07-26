@@ -63,6 +63,8 @@ public class Reflector {
   }
 
   private void addDefaultConstructor(Class<?> clazz) {
+    // clazz.getConstructors() 获取到的是 public 型构造方法
+    // clazz.getDeclaredConstructors() 获取到的是所有的构造方法包括私有、包访问权限
     Constructor<?>[] consts = clazz.getDeclaredConstructors();
     for (Constructor<?> constructor : consts) {
       if (constructor.getParameterTypes().length == 0) {
@@ -73,6 +75,11 @@ public class Reflector {
             // Ignored. This is only a final precaution, nothing we can do.
           }
         }
+        // isAccessible() 方法不能判断一个构造方法是不是 public 的，初始化的时候是 false ，不管该方法是不是 public 的。
+        // isAccessible() 返回的 true 表示绕过 java 语言的访问检查机制，false 表示不绕过 java 语言的访问检查机制。
+        // 比如 method 在执行 meghod.invoke() 方法时，如果 isAccessible() 为 false 的话会检查 method 的访问权限，如果是 private 的话就会报错。
+        // 如果设置了 SecurityManager 以后调用 canAccessPrivateMethods() 方法会返回 false ，此时事实上 constructor 有可能是 public 的是默认方法但 isAccessible() 返回 false 。
+
         if (constructor.isAccessible()) {
           this.defaultConstructor = constructor;
         }
@@ -113,6 +120,7 @@ public class Reflector {
         while (iterator.hasNext()) {
           Method method = iterator.next();
           Class<?> methodType = method.getReturnType();
+          // 为什么会抛异常呢
           if (methodType.equals(getterType)) {
             throw new ReflectionException("Illegal overloaded getter method with ambiguous type for property "
                 + propName + " in class " + firstMethod.getDeclaringClass()
@@ -261,6 +269,7 @@ public class Reflector {
    *
    * @param cls The class
    * @return An array containing all methods in this class
+   * 获取该类以及该类的所有父类及其父接口的所有方法 但只获取到该类的直接父接口的方法和该父类的直接父接口的方法
    */
   private Method[] getClassMethods(Class<?> cls) {
     Map<String, Method> uniqueMethods = new HashMap<String, Method>();
@@ -270,6 +279,7 @@ public class Reflector {
 
       // we also need to look for interface methods -
       // because the class may be abstract
+      // todo 如果有多重接口继承是不是就有问题，用递归才可以把所有的接口以及父接口的方法都获取到
       Class<?>[] interfaces = currentClass.getInterfaces();
       for (Class<?> anInterface : interfaces) {
         addUniqueMethods(uniqueMethods, anInterface.getMethods());
@@ -284,7 +294,6 @@ public class Reflector {
   }
 
   private void addUniqueMethods(Map<String, Method> uniqueMethods, Method[] methods) {
-    System.out.println("0");
     for (Method currentMethod : methods) {
       if (!currentMethod.isBridge()) {
         String signature = getSignature(currentMethod);
@@ -304,7 +313,6 @@ public class Reflector {
         }
       }
     }
-    System.out.println("1");
   }
 
   private String getSignature(Method method) {
