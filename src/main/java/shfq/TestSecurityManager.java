@@ -9,6 +9,8 @@ import java.lang.reflect.ReflectPermission;
  * description:
  * create date: 2016/7/26.
  * 虚拟机参数设置：-Djava.security.manager=default
+ * 透视JAVA——反编译、修补和逆向工程技术
+ * 在开启了 securityManager 之后，Object o = Object.class.getDeclaredConstructors(); 会报错
  */
 public class TestSecurityManager {
     public static void main(String[] args) {

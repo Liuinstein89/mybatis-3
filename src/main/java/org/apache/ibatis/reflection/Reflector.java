@@ -15,24 +15,14 @@
  */
 package org.apache.ibatis.reflection;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ReflectPermission;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
 import org.apache.ibatis.reflection.invoker.GetFieldInvoker;
 import org.apache.ibatis.reflection.invoker.Invoker;
 import org.apache.ibatis.reflection.invoker.MethodInvoker;
 import org.apache.ibatis.reflection.invoker.SetFieldInvoker;
 import org.apache.ibatis.reflection.property.PropertyNamer;
+
+import java.lang.reflect.*;
+import java.util.*;
 
 /*
  * This class represents a cached set of class definition information that
@@ -294,6 +284,7 @@ public class Reflector {
   }
 
   private void addUniqueMethods(Map<String, Method> uniqueMethods, Method[] methods) {
+    System.out.println("0");
     for (Method currentMethod : methods) {
       if (!currentMethod.isBridge()) {
         String signature = getSignature(currentMethod);
@@ -313,6 +304,7 @@ public class Reflector {
         }
       }
     }
+    System.out.println("1");
   }
 
   private String getSignature(Method method) {
