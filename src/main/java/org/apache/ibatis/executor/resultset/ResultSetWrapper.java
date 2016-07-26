@@ -37,6 +37,7 @@ import org.apache.ibatis.type.UnknownTypeHandler;
 
 /**
  * @author Iwao AVE!
+ * 对 ResultSet 的封装
  */
 class ResultSetWrapper {
 

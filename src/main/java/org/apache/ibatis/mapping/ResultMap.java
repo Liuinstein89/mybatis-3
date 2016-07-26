@@ -28,7 +28,9 @@ import org.apache.ibatis.session.Configuration;
  * @author Clinton Begin
  */
 public class ResultMap {
+  // 如果是 mapper 的话 id 是 包名.类名.方法名-参数类型
   private String id;
+  // 返回的对象的类型
   private Class<?> type;
   private List<ResultMapping> resultMappings;
   private List<ResultMapping> idResultMappings;

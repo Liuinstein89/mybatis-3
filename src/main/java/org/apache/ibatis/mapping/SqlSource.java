@@ -18,7 +18,7 @@ package org.apache.ibatis.mapping;
 /**
  * Represents the content of a mapped statement read from an XML file or an annotation. 
  * It creates the SQL that will be passed to the database out of the input parameter received from the user.
- *
+ * 代表了从 XML 文件中的映射语句中读取出来的内容或者是 mapper 接口中的 annotation 中的内容
  * @author Clinton Begin
  */
 public interface SqlSource {

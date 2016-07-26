@@ -174,7 +174,9 @@ public class MapperMethod {
 
   public static class SqlCommand {
 
+    // 包名.类名.方法名
     private final String name;
+    // INSERT UPDATE DELETE SELECT FLUSH UNKNOWN
     private final SqlCommandType type;
 
     public SqlCommand(Configuration configuration, Class<?> mapperInterface, Method method) {
@@ -183,6 +185,8 @@ public class MapperMethod {
       if (configuration.hasStatement(statementName)) {
         ms = configuration.getMappedStatement(statementName);
       } else if (!mapperInterface.equals(method.getDeclaringClass())) { // issue #35
+        // 当前的这个 mapper 接口和这个 method 所属的声明类不是同一个类时
+        // 换句话说当前的 mapper 接口继承了一个父接口，调用的方法是父接口的方法
         String parentStatementName = method.getDeclaringClass().getName() + "." + method.getName();
         if (configuration.hasStatement(parentStatementName)) {
           ms = configuration.getMappedStatement(parentStatementName);
