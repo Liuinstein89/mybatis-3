@@ -15,13 +15,13 @@
  */
 package org.apache.ibatis.binding;
 
+import org.apache.ibatis.reflection.ExceptionUtil;
+import org.apache.ibatis.session.SqlSession;
+
 import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Map;
-
-import org.apache.ibatis.reflection.ExceptionUtil;
-import org.apache.ibatis.session.SqlSession;
 
 /**
  * @author Clinton Begin
@@ -42,6 +42,7 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
 
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    // 如果调用的方法是 Object 的方法比如 equals() 、toString() 方法等，实际调用的是 MapperProxy 的方法而不是动态代理的方法。
     if (Object.class.equals(method.getDeclaringClass())) {
       try {
         return method.invoke(this, args);
