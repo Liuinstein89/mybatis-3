@@ -1,7 +1,5 @@
 package shfq;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.lang.reflect.ReflectPermission;
 
 /**
@@ -14,20 +12,24 @@ import java.lang.reflect.ReflectPermission;
  */
 public class TestSecurityManager {
     public static void main(String[] args) {
-        try {
-            System.out.println("hello");
-            canAccessPrivateMethods();
-            Constructor[] constructors = TestReflector.class.getDeclaredConstructors();
-            constructors[0].setAccessible(true);
-            TestReflector reflector = (TestReflector) constructors[0].newInstance("test parameter");
-            Method method = TestReflector.class.getDeclaredMethod("func1");
-            method.invoke(reflector);
-            System.out.println("");
+//        try {
+//            System.out.println("hello");
+//            canAccessPrivateMethods();
+//            Constructor[] constructors = TestReflector.class.getDeclaredConstructors();
+//            constructors[0].setAccessible(true);
+//            TestReflector reflector = (TestReflector) constructors[0].newInstance("test parameter");
+//            Method method = TestReflector.class.getDeclaredMethod("func1");
+//            method.invoke(reflector);
+//            System.out.println("");
+//
+//        } catch (Exception e) {
+//
+//            System.out.println(e);
+//        }
+        String s = "\\t";
+        System.out.println(s.length());
+        System.out.println(s);
 
-        } catch (Exception e) {
-
-            System.out.println(e);
-        }
     }
     private static boolean canAccessPrivateMethods() {
         try {

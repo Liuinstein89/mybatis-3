@@ -49,6 +49,7 @@ public class ParameterExpression extends HashMap<String, String> {
     }
   }
 
+  // todo 解析括号中的内容 (abc) expression.substring(left, right - 1) 的结果是 abc 但是有多重括号，解析的结果却不对 ((abc)) ，解析出来的结果是 (abc
   private void expression(String expression, int left) {
     int match = 1;
     int right = left + 1;
@@ -72,12 +73,15 @@ public class ParameterExpression extends HashMap<String, String> {
     }
   }
 
+  // todo skipWhiteSpace 跳过空格 空格的 ascii 值是 32
+  // 返回的是 expression 中的第一个非白空格的索引 '  abc' 则返回 2 '     ' 则返回 5
   private int skipWS(String expression, int p) {
     for (int i = p; i < expression.length(); i++) {
       if (expression.charAt(i) > 0x20) {
         return i;
       }
     }
+    // expression 中的所有字符都是空格（或者是其值小于 0x20）
     return expression.length();
   }
 

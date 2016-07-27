@@ -56,6 +56,7 @@ public class GenericTokenParser {
         }
         start = text.indexOf(openToken, offset);
       }
+      // TODO 什么时候会出现这种情况 当结束标签不是在 text 的最末尾的时候会出现这种情况
       if (offset < src.length) {
         builder.append(src, offset, src.length - offset);
       }
