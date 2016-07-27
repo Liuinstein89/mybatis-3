@@ -215,6 +215,9 @@ public class MapperAnnotationBuilder {
     LanguageDriver languageDriver = getLanguageDriver(method);
     SqlSource sqlSource = getSqlSourceFromAnnotations(method, parameterTypeClass, languageDriver);
     if (sqlSource != null) {
+
+
+      地地道道
       Options options = method.getAnnotation(Options.class);
       final String mappedStatementId = type.getName() + "." + method.getName();
       Integer fetchSize = null;
