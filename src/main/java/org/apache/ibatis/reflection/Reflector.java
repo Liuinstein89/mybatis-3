@@ -122,6 +122,7 @@ public class Reflector {
           Class<?> methodType = method.getReturnType();
           // 为什么会抛异常呢
           if (methodType.equals(getterType)) {
+            // todo overload or override?
             throw new ReflectionException("Illegal overloaded getter method with ambiguous type for property "
                 + propName + " in class " + firstMethod.getDeclaringClass()
                 + ".  This breaks the JavaBeans " + "specification and can cause unpredicatble results.");
