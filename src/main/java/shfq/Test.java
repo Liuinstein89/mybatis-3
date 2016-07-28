@@ -39,22 +39,22 @@ public class Test {
     }
 
     public static void testInsert() {
-        try {
-            Reader reader = Resources.getResourceAsReader("shfq/mybatis-config.xml");
-            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
-            SqlSession session = sqlSessionFactory.openSession();
-
-            //Create a new student object
-            Student student = new Student("Mohammad", "It", 80, 984803322, "Mohammad@gmail.com");
-
-            //Insert student data
-            session.insert("Student.insert", student);
-            System.out.println("record inserted successfully");
-            session.commit();
-            session.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Reader reader = Resources.getResourceAsReader("shfq/mybatis-config.xml");
+//            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+//            SqlSession session = sqlSessionFactory.openSession();
+//
+//            //Create a new student object
+//            Student student = new Student("Mohammad", "It", 80, 984803322, "Mohammad@gmail.com");
+//
+//            //Insert student data
+//            session.insert("Student.insert", student);
+//            System.out.println("record inserted successfully");
+//            session.commit();
+//            session.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public static void testQuery() {
@@ -95,7 +95,7 @@ public class Test {
             SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
             session = sqlSessionFactory.openSession();
             StudentMapper mapper = session.getMapper(StudentMapper.class);
-            Student student = mapper.selectStudent(20);
+            Student student = mapper.selectStudentWithConstructor(20);
             System.out.println("");
 
         } catch (IOException e) {
@@ -127,26 +127,26 @@ public class Test {
 
     }
     private static void update() {
-        SqlSession session = null;
-        try {
-            Student student = new Student();
-            student.setId(10);
-//            student.setName("shfq");
-            student.setEmail("shanbeirenshfq@163.com");
-
-            Reader reader = Resources.getResourceAsReader("shfq/mybatis-config.xml");
-            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
-            session = sqlSessionFactory.openSession();
-            int count = session.update("updateStudent.updateStudent", student);
-            System.out.println(count + " record was updated");
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
+//        SqlSession session = null;
+//        try {
+//            Student student = new Student();
+//            student.setId(10);
+////            student.setName("shfq");
+//            student.setEmail("shanbeirenshfq@163.com");
+//
+//            Reader reader = Resources.getResourceAsReader("shfq/mybatis-config.xml");
+//            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+//            session = sqlSessionFactory.openSession();
+//            int count = session.update("updateStudent.updateStudent", student);
+//            System.out.println(count + " record was updated");
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            if (session != null) {
+//                session.close();
+//            }
+//        }
 
     }
 

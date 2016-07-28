@@ -215,9 +215,6 @@ public class MapperAnnotationBuilder {
     LanguageDriver languageDriver = getLanguageDriver(method);
     SqlSource sqlSource = getSqlSourceFromAnnotations(method, parameterTypeClass, languageDriver);
     if (sqlSource != null) {
-
-
-      地地道道
       Options options = method.getAnnotation(Options.class);
       final String mappedStatementId = type.getName() + "." + method.getName();
       Integer fetchSize = null;
@@ -328,6 +325,8 @@ public class MapperAnnotationBuilder {
     return parameterType;
   }
 
+  // mapper 中的方法的返回值如果是 void 话，同时 ResultType annotation 不为空的话，则返回类型为 ResultType 中定义的类型
+  // 如果是泛型的话返回的是泛型的实际类型
   private Class<?> getReturnType(Method method) {
     Class<?> returnType = method.getReturnType();
     // issue #508
@@ -338,6 +337,7 @@ public class MapperAnnotationBuilder {
       } 
     } else if (Collection.class.isAssignableFrom(returnType)) {
       Type returnTypeParameter = method.getGenericReturnType();
+      // 应用了泛型类型的类的类型为 ParameterizedType 例如 List<String>，但 List 却不是
       if (returnTypeParameter instanceof ParameterizedType) {
         Type[] actualTypeArguments = ((ParameterizedType) returnTypeParameter).getActualTypeArguments();
         if (actualTypeArguments != null && actualTypeArguments.length == 1) {

@@ -15,8 +15,12 @@
  */
 package shfq;
 
+import org.apache.ibatis.annotations.Arg;
+import org.apache.ibatis.annotations.ConstructorArgs;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.type.IntegerTypeHandler;
+import org.apache.ibatis.type.JdbcType;
 
 import java.util.Map;
 
@@ -32,4 +36,16 @@ public interface StudentMapper {
     @MapKey("id")
     @Select({"SELECT * FROM student WHERE id=#{id}"})
     Map<Integer, Student> selectStudentMap(int id);
+
+
+    @ConstructorArgs(value = {
+            @Arg(id = true, column = "id", javaType = int.class, jdbcType = JdbcType.INTEGER, typeHandler = IntegerTypeHandler.class),
+            @Arg(column = "name"),
+            @Arg(column = "branch"),
+            @Arg(column = "percentage", javaType = int.class),
+            @Arg(column = "phone", javaType = int.class),
+            @Arg(column = "email"),
+            @Arg(column = "address")})
+    @Select("SELECT * FROM student WHERE id=#{id}")
+    Student selectStudentWithConstructor(int id);
 }

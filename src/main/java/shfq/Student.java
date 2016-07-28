@@ -28,17 +28,28 @@ public class Student{
     private String email;
     private Address address;
 
-    public Student(String name, String branch, int percentage, int phone, String email) {
-        super();
+//    public Student(String name, String branch, int percentage, int phone, String email) {
+//        super();
+//        this.name = name;
+//        this.branch = branch;
+//        this.percentage = percentage;
+//        this.phone = phone;
+//        this.email = email;
+//    }
+
+    public Student(int id, String name, String branch, int percentage, int phone, String email, Address address) {
+        this.id = id;
         this.name = name;
         this.branch = branch;
         this.percentage = percentage;
         this.phone = phone;
         this.email = email;
+        this.address = address;
     }
 
-    public Student() {
-    }
+
+//    public Student() {
+//    }
 
     public int getId() {
         return id;

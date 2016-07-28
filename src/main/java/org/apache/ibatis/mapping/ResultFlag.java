@@ -19,5 +19,6 @@ package org.apache.ibatis.mapping;
  * @author Clinton Begin
  */
 public enum ResultFlag {
+  // 在 @Arg 中如果 id=true 则 ResultFlag 为 ID，否则为 CONSTRUCTOR
   ID, CONSTRUCTOR
 }

@@ -15,15 +15,15 @@
  */
 package org.apache.ibatis.mapping;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Clinton Begin
@@ -40,6 +40,7 @@ public class ResultMapping {
   private String nestedQueryId;
   private Set<String> notNullColumns;
   private String columnPrefix;
+  // 在 Mapper 的 @Arg 中如果是主键的话 List<ResultFlag> 中有两种值 ID 和 CONSTRUCTOR，如果是非主键的话则只有 CONSTRUCTOR
   private List<ResultFlag> flags;
   private List<ResultMapping> composites;
   private String resultSet;

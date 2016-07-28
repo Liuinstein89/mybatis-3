@@ -15,20 +15,23 @@
  */
 package org.apache.ibatis.annotations;
 
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.TypeHandler;
+import org.apache.ibatis.type.UnknownTypeHandler;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import org.apache.ibatis.type.JdbcType;
-import org.apache.ibatis.type.TypeHandler;
-import org.apache.ibatis.type.UnknownTypeHandler;
 
 /**
  * @author Clinton Begin
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
+// column 和 javaType 是必填的，其他可以选填 javaType 如果不填的话，在调用构造方法的时候，mybatis 认为这个参数的类型是 Object ，如果构造方法的参数不是 Object 类型的话就会报错
+// typeHandler 会根据 javaType 查出来的，多种 jdbcType 对应着同一种 javaType 比如 VARCHAR 、null 、NCHAR 、CHAR 、LONGVARCHAR 、NCLOB 、CLOB 、NVARCHAR 都对应着 String.class
+// 一个 Arg 最终会转化为一个 ResultMapping
 public @interface Arg {
   boolean id() default false;
 
@@ -40,6 +43,7 @@ public @interface Arg {
 
   Class<? extends TypeHandler<?>> typeHandler() default UnknownTypeHandler.class;
 
+  // todo select 和 resultMap 这两个方法是干什么用的？
   String select() default "";
 
   String resultMap() default "";

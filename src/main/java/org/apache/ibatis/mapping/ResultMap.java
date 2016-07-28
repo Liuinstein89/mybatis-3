@@ -15,14 +15,9 @@
  */
 package org.apache.ibatis.mapping;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-
 import org.apache.ibatis.session.Configuration;
+
+import java.util.*;
 
 /**
  * @author Clinton Begin
@@ -33,7 +28,10 @@ public class ResultMap {
   // 返回的对象的类型
   private Class<?> type;
   private List<ResultMapping> resultMappings;
+  // 在 mapper 中 @ConstructorArgs 中如果有 @Arg id=true 的话，则添加在 list 中，如果 list 为空的话，则把所有的 ResultMapping 都添加到 list 中
   private List<ResultMapping> idResultMappings;
+  // 在 mapper 中 @ConstructorArgs 中出现的都属于 constructorResultMappings
+  // 同一个 ResultMapping 不会同时出现在 constructorResultMappings 和 propertyResultMappings 两个 list 中
   private List<ResultMapping> constructorResultMappings;
   private List<ResultMapping> propertyResultMappings;
   private Set<String> mappedColumns;
