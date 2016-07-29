@@ -15,16 +15,17 @@
  */
 package org.apache.ibatis.mapping;
 
+import org.apache.ibatis.session.Configuration;
+
 import java.util.Collections;
 import java.util.List;
-
-import org.apache.ibatis.session.Configuration;
 
 /**
  * @author Clinton Begin
  */
 public class ParameterMap {
 
+  // mapper 中的内联参数为 包名.方法名-Inline
   private String id;
   private Class<?> type;
   private List<ParameterMapping> parameterMappings;

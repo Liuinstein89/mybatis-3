@@ -42,7 +42,10 @@ public class ParameterExpression extends HashMap<String, String> {
 
   private void parse(String expression) {
     int p = skipWS(expression, 0);
+    // 这儿可以解析出表达式，事实上现在的代码还不支持表达式 在 SqlSourceBuilder 中的 buildParameterMapping() 方法中的
+    // else if ("expression".equals(name)) 然后抛出异常可以看出现在的代码暂时还不支持表达式
     if (expression.charAt(p) == '(') {
+      // 表达式用括号括起来
       expression(expression, p + 1);
     } else {
       property(expression, p);
@@ -98,6 +101,7 @@ public class ParameterExpression extends HashMap<String, String> {
   private void jdbcTypeOpt(String expression, int p) {
     p = skipWS(expression, p);
     if (p < expression.length()) {
+      // jdbcType 以 : 开头
       if (expression.charAt(p) == ':') {
         jdbcType(expression, p + 1);
       } else if (expression.charAt(p) == ',') {
@@ -108,6 +112,7 @@ public class ParameterExpression extends HashMap<String, String> {
     }
   }
 
+  // jdbcType 的形式为 :CHAR
   private void jdbcType(String expression, int p) {
     int left = skipWS(expression, p);
     int right = skipUntil(expression, left, ",");
@@ -118,7 +123,7 @@ public class ParameterExpression extends HashMap<String, String> {
     }
     option(expression, right + 1);
   }
-
+  // option 的形式为 ,optionName1=optionValue1,optionName2=optionValue2
   private void option(String expression, int p) {
     int left = skipWS(expression, p);
     if (left < expression.length()) {

@@ -52,7 +52,7 @@ public class XMLLanguageDriver implements LanguageDriver {
       return createSqlSource(configuration, parser.evalNode("/script"), parameterType);
     } else {
       // issue #127
-      // 如果 script 中含有 ${} 则替换相应的属性。
+      // 如果 script 中含有 ${} 而且如果在 Configuration 中确实有该属性则替换相应的属性，如果没有的话仍然为原来的值。
       script = PropertyParser.parse(script, configuration.getVariables());
       TextSqlNode textSqlNode = new TextSqlNode(script);
       if (textSqlNode.isDynamic()) {

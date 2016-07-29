@@ -210,6 +210,7 @@ public class MapperAnnotationBuilder {
     return null;
   }
 
+  // 把一个方法解析成一条语句
   void parseStatement(Method method) {
     Class<?> parameterTypeClass = getParameterType(method);
     LanguageDriver languageDriver = getLanguageDriver(method);
@@ -378,6 +379,7 @@ public class MapperAnnotationBuilder {
     try {
       Class<? extends Annotation> sqlAnnotationType = getSqlAnnotationType(method);
       Class<? extends Annotation> sqlProviderAnnotationType = getSqlProviderAnnotationType(method);
+      // sqlAnnotation 和 sqlProviderAnnotation 二者只能有一个，不能同时有两个
       if (sqlAnnotationType != null) {
         if (sqlProviderAnnotationType != null) {
           throw new BindingException("You cannot supply both a static SQL and SqlProvider to method named " + method.getName());
