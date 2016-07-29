@@ -36,6 +36,7 @@ public class GenericTokenParser {
       char[] src = text.toCharArray();
       int offset = 0;
       int start = text.indexOf(openToken, offset);
+      // 循环解析多个参数
       while (start > -1) {
         if (start > 0 && src[start - 1] == '\\') {
           // the variable is escaped. remove the backslash.

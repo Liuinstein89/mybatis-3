@@ -124,6 +124,7 @@ public class ParameterExpression extends HashMap<String, String> {
     option(expression, right + 1);
   }
   // option 的形式为 ,optionName1=optionValue1,optionName2=optionValue2
+  // option 的 name 只能是 javaType,jdbcType,mode,numericScale,resultMap,typeHandler,jdbcTypeName
   private void option(String expression, int p) {
     int left = skipWS(expression, p);
     if (left < expression.length()) {
