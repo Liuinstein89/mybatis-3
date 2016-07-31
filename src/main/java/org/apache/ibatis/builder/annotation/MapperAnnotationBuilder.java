@@ -156,6 +156,7 @@ public class MapperAnnotationBuilder {
     return resultMapId;
   }
 
+  // 包名.类名.方法名.参数类型(参数之间用 - 隔开，如果没有参数的话用 void )
   private String generateResultMapName(Method method) {
     StringBuilder suffix = new StringBuilder();
     for (Class<?> c : method.getParameterTypes()) {

@@ -33,6 +33,7 @@ import org.apache.ibatis.session.Configuration;
 /**
  * @author Clinton Begin
  */
+// 封装了 sql 参数映射 参数
 public class BoundSql {
 
   private String sql;

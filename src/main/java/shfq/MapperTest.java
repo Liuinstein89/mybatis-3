@@ -29,42 +29,42 @@ import java.io.Reader;
  * create date: 2016/7/11.
  */
 public class MapperTest {
-    public static void main(String[] args) {
-        Student student = query();
-        System.out.println("");
-
-    }
-    private static Student query() {
-        SqlSession session = null;
-        try {
-            Reader reader = Resources.getResourceAsReader("shfq/mybatis-config.xml");
-            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
-            session = sqlSessionFactory.openSession();
-            StudentMapperTest studentMapperTest = session.getMapper(StudentMapperTest.class);
-//            Student student = new Student();
-//            student.setEmail("shfq@163.com");
-//            student.setName("shfq");
-//            student.setAddress("shanxi");
+//    public static void main(String[] args) {
+//        Student student = query();
+//        System.out.println("");
 //
-//            studentMapper.add();
-            Student student = new Student();
-            student.setName("shfq111");
-            student.setEmail("shfq@gmail.com");
-            student.setId(10);
-            int i = studentMapperTest.update(student);
-            session.commit();
-            session.close();
-
-            return student;
-        } catch (IOException e) {
-            e.printStackTrace();
-            if (session != null) {
-                session.rollback();
-                session.close();
-            }
-
-            return null;
-        } finally {
-        }
-    }
+//    }
+//    private static Student query() {
+//        SqlSession session = null;
+//        try {
+//            Reader reader = Resources.getResourceAsReader("shfq/mybatis-config.xml");
+//            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+//            session = sqlSessionFactory.openSession();
+//            StudentMapperTest studentMapperTest = session.getMapper(StudentMapperTest.class);
+////            Student student = new Student();
+////            student.setEmail("shfq@163.com");
+////            student.setName("shfq");
+////            student.setAddress("shanxi");
+////
+////            studentMapper.add();
+//            Student student = new Student();
+//            student.setName("shfq111");
+//            student.setEmail("shfq@gmail.com");
+//            student.setId(10);
+//            int i = studentMapperTest.update(student);
+//            session.commit();
+//            session.close();
+//
+//            return student;
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            if (session != null) {
+//                session.rollback();
+//                session.close();
+//            }
+//
+//            return null;
+//        } finally {
+//        }
+//    }
 }

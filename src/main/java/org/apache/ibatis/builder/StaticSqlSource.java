@@ -27,7 +27,9 @@ import org.apache.ibatis.session.Configuration;
  */
 public class StaticSqlSource implements SqlSource {
 
+  // 经过处理的 sql 已经把 #{name} 替换为 ?
   private String sql;
+  // 参数映射列表
   private List<ParameterMapping> parameterMappings;
   private Configuration configuration;
 

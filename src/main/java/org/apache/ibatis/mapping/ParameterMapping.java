@@ -33,10 +33,14 @@ public class ParameterMapping {
   private ParameterMode mode;
   private Class<?> javaType = Object.class;
   private JdbcType jdbcType;
+  // 如果类型是数值型的话 表示的是小数点后的位数
   private Integer numericScale;
   private TypeHandler<?> typeHandler;
+  // 对应着 mapper 参数中的 ParameterExpression 中的 resultMap option
   private String resultMapId;
+  // 对应着 mapper 参数中的 ParameterExpression 中的 jdbcTypeName option
   private String jdbcTypeName;
+  // 暂时还不支持 expression 应该是为以后预留出来的
   private String expression;
 
   private ParameterMapping() {
