@@ -15,25 +15,15 @@
  */
 package org.apache.ibatis.executor.resultset;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.type.JdbcType;
-import org.apache.ibatis.type.ObjectTypeHandler;
-import org.apache.ibatis.type.TypeHandler;
-import org.apache.ibatis.type.TypeHandlerRegistry;
-import org.apache.ibatis.type.UnknownTypeHandler;
+import org.apache.ibatis.type.*;
+
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * @author Iwao AVE!
@@ -43,11 +33,17 @@ class ResultSetWrapper {
 
   private final ResultSet resultSet;
   private final TypeHandlerRegistry typeHandlerRegistry;
+  // 列的别名或列名
   private final List<String> columnNames = new ArrayList<String>();
+  // 列的 java 类型
   private final List<String> classNames = new ArrayList<String>();
+  // 列的 jdbc 类型
   private final List<JdbcType> jdbcTypes = new ArrayList<JdbcType>();
   private final Map<String, Map<Class<?>, TypeHandler<?>>> typeHandlerMap = new HashMap<String, Map<Class<?>, TypeHandler<?>>>();
+  // 为什么要设计成这样的结构呢，即 Map 里的值是 List 因为一个结果集里可能需要映射多个 ResultMap 一个 ResultMap 需要对应一个 List
   private Map<String, List<String>> mappedColumnNamesMap = new HashMap<String, List<String>>();
+  // 为什么要设计成这样的结构呢，即 Map 里的值是 List 因为一个结果集里可能需要映射多个 ResultMap 一个 ResultMap 需要对应一个 List
+
   private Map<String, List<String>> unMappedColumnNamesMap = new HashMap<String, List<String>>();
 
   public ResultSetWrapper(ResultSet rs, Configuration configuration) throws SQLException {

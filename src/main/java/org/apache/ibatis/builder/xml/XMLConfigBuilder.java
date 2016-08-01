@@ -345,6 +345,7 @@ public class XMLConfigBuilder extends BaseBuilder {
             mapperParser.parse();
           } else if (resource == null && url == null && mapperClass != null) {
             Class<?> mapperInterface = Resources.classForName(mapperClass);
+            // 为什么需要把 mapper 加到集合中？因为在以后 SqlSession.getMapper() 中会根据 class 来获取 mapper
             configuration.addMapper(mapperInterface);
           } else {
             throw new BuilderException("A mapper element may only specify a url, resource or class, but not more than one.");

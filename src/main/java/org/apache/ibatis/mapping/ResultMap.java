@@ -32,8 +32,10 @@ public class ResultMap {
   private List<ResultMapping> idResultMappings;
   // 在 mapper 中 @ConstructorArgs 中出现的都属于 constructorResultMappings
   // 同一个 ResultMapping 不会同时出现在 constructorResultMappings 和 propertyResultMappings 两个 list 中
+  // 为什么不会同时出现呢？constructorResultMappings 会在创建构造方法的时候设置属性值，如果在构造方法中出现过的当然不需要再次重新设置属性值
   private List<ResultMapping> constructorResultMappings;
   private List<ResultMapping> propertyResultMappings;
+  // 已经映射过的列名集合，已经映射过的列名不会再次给相应的属性设值，比如在构造方法中出现过的列名就属于已经映射过的列名。
   private Set<String> mappedColumns;
   private Discriminator discriminator;
   private boolean hasNestedResultMaps;

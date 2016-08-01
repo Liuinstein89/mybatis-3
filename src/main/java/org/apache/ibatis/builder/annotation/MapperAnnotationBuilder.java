@@ -81,9 +81,11 @@ public class MapperAnnotationBuilder {
       parseCache();
       parseCacheRef();
       Method[] methods = type.getMethods();
+      // 循环解析 mapper 中的所有方法
       for (Method method : methods) {
         try {
           // issue #237
+          // 在泛型中会用到桥接方法，桥接方法是由编译器自动生成的方法
           if (!method.isBridge()) {
             parseStatement(method);
           }
@@ -217,6 +219,7 @@ public class MapperAnnotationBuilder {
     LanguageDriver languageDriver = getLanguageDriver(method);
     SqlSource sqlSource = getSqlSourceFromAnnotations(method, parameterTypeClass, languageDriver);
     if (sqlSource != null) {
+      // 获取 Options 并为各选项赋初值，如果 Options 不为空的话用 Options 中的值替换初始值
       Options options = method.getAnnotation(Options.class);
       final String mappedStatementId = type.getName() + "." + method.getName();
       Integer fetchSize = null;

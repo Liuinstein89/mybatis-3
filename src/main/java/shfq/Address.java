@@ -27,10 +27,8 @@ public class Address implements Serializable {
     private String name;
     private String postCode;
 
-    public Address(int id, String name, String postCode) {
+    public Address(int id) {
         this.id = id;
-        this.name = name;
-        this.postCode = postCode;
     }
 
     public int getId() {

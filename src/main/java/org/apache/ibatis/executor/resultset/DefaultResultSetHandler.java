@@ -553,10 +553,13 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       } catch (SQLException e) {
         throw new ExecutorException("Could not process result for mapping: " + constructorMapping, e);
       }
+      // 构造方法中参数的 java 类型 在获取构造方法时候会根据参数类型来获取
       constructorArgTypes.add(parameterType);
+      // 从结果集中获取到的某个参数的参数值 在调用构造方法的时候会传参实例化对象
       constructorArgs.add(value);
       foundValues = value != null || foundValues;
     }
+    // 调用有参数的构造方法来创建对象
     return foundValues ? objectFactory.create(resultType, constructorArgTypes, constructorArgs) : null;
   }
 
