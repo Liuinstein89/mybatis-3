@@ -187,6 +187,7 @@ public class MapperAnnotationBuilder {
         String caseResultMapId = resultMapId + "-" + c.value();
         List<ResultMapping> resultMappings = new ArrayList<ResultMapping>();
         // issue #136
+        // 因为鉴别器会根据 case 的不同值返回不同类型的对象，所以可能有构造方法
         applyConstructorArgs(c.constructArgs(), resultType, resultMappings);
         applyResults(c.results(), resultType, resultMappings);
         // TODO add AutoMappingBehaviour
@@ -505,6 +506,21 @@ public class MapperAnnotationBuilder {
     return result.one().select().length() > 0 || result.many().select().length() > 0;  
   }
 
+  /**
+   * applyConstructorArgs 方法和 applyResults 方法很相似
+   *
+   * 几处区别：
+   * 1、applyConstructorArgs 中的 flags 肯定有 flags.add(ResultFlag.CONSTRUCTOR); 如果是主键的话还会有 flags.add(ResultFlag.ID);
+   *     但 applyResults 中如果是主键的话会有 flags.add(ResultFlag.ID); 如果不为主键的话则 flags 为空。
+   * 2、applyConstructorArgs 方法中的 assistant.buildResultMapping() 方法中的第二个参数 property 为空，为什么呢？因为构造方法中的 Arg
+   *     是不需要属性的，只需要列名就行了。为什么呢？因为调用构造方法创建对象的时候只需要知道相应的值就可以，不需要字段名/属性名
+   * 3、applyResults 的 nestedResultMap 参数为空，这是为什么呢 todo ？？？？？？？？？？？？？？？？？是因为它有了 One or Many 就不需要了吗？
+   * 4、为什么 applyConstructorArgs 的 lazy 参数为 false 而 applyResults 的是 isLazy(result) todo ??????????
+   *
+   * @param args
+   * @param resultType
+   * @param resultMappings
+     */
   private void applyConstructorArgs(Arg[] args, Class<?> resultType, List<ResultMapping> resultMappings) {
     for (Arg arg : args) {
       List<ResultFlag> flags = new ArrayList<ResultFlag>();

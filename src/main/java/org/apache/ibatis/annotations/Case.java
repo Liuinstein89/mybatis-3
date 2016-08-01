@@ -30,7 +30,10 @@ public @interface Case {
 
   Class<?> type();
 
+  // 不同的 Case 它们返回的列可能会不同所以需要不同的 Result 映射，一般使用到鉴别器的情况是基类、子类，Case 确定了子类的类型，
+  // 每个子类的属性可能不相同所以才会有 Result[] 映射
   Result[] results() default {};
 
+  // 鉴别器会根据不同的 Case 来调用不同的类的构造方法创建对象，所以会有构造方法
   Arg[] constructArgs() default {};
 }

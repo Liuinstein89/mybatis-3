@@ -378,6 +378,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
     TypeHandler<?> typeHandlerInstance = resolveTypeHandler(javaTypeClass, typeHandler);
     List<ResultMapping> composites = parseCompositeColumnName(column);
     if (composites.size() > 0) {
+      // 说明是外键，关联了一个对象，所以把 column 置空
       column = null;
     }
     ResultMapping.Builder builder = new ResultMapping.Builder(configuration, property, column, javaTypeClass);
