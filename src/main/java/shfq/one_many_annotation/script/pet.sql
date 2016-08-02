@@ -22,7 +22,7 @@ DROP TABLE IF EXISTS `pet`;
 CREATE TABLE `pet` (
   `id` int(11) NOT NULL,
   `name` varchar(20) DEFAULT NULL,
-  `owner` int(11) DEFAULT NULL,
+  `owner_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

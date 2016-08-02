@@ -504,6 +504,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     final Object resultObject = createResultObject(rsw, resultMap, constructorArgTypes, constructorArgs, columnPrefix);
     if (resultObject != null && !typeHandlerRegistry.hasTypeHandler(resultMap.getType())) {
       final List<ResultMapping> propertyMappings = resultMap.getPropertyResultMappings();
+      // todo ？只要有一个属性配置了懒加载就需要创建代理对象？？？
       for (ResultMapping propertyMapping : propertyMappings) {
         // issue gcode #109 && issue #149
         if (propertyMapping.getNestedQueryId() != null && propertyMapping.isLazy()) {

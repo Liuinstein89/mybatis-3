@@ -11,7 +11,7 @@ import org.apache.ibatis.annotations.Select;
  * create date: 2016/8/2.
  */
 public interface PeopleMapper {
-    @Results(value = {@Result(id = true, column = "id", property = "id", many = @Many(select = "select * from pet where owner=#{id}"))})
+    @Results(value = {@Result(id = true, column = "id", property = "pets", many = @Many(select = "shfq.one_many_annotation.PetMapper.selectPets"))})
     @Select("select * from people where id=#{id}")
     People selectPeople(int id);
 }
