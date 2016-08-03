@@ -21,9 +21,12 @@ import java.util.*;
 
 /**
  * @author Clinton Begin
+ * ResultMap 是对查询出来的结果集到返回对象整体映射所需的条件的一个封装
+ *
  */
 public class ResultMap {
   // 如果是 mapper 的话 id 是 包名.类名.方法名-参数类型
+  // 关联着一条 sql 语句
   private String id;
   // 返回的对象的类型
   private Class<?> type;
@@ -39,6 +42,7 @@ public class ResultMap {
   private Set<String> mappedColumns;
   private Discriminator discriminator;
   private boolean hasNestedResultMaps;
+  // 有没有嵌套查询 例如在 mapper 中有 annotation @One @Many 就是嵌套查询
   private boolean hasNestedQueries;
   private Boolean autoMapping;
 
@@ -100,6 +104,7 @@ public class ResultMap {
         }
       }
       if (resultMap.idResultMappings.isEmpty()) {
+        // 为什么要全部添加
         resultMap.idResultMappings.addAll(resultMap.resultMappings);
       }
       // lock down collections

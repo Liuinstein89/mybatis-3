@@ -13,13 +13,14 @@ import java.io.Reader;
  * description:
  * create date: 2016/8/2.
  */
-public class PeopleMapperTest {
+public class MapperTest {
     public static void main(String[] args) {
-        queryByMapper();
+        queryPeopleByMapper();
+//        queryPetByMapper();
 
     }
 
-    private static void queryByMapper() {
+    private static void queryPeopleByMapper() {
         SqlSession session = null;
         try {
             Reader reader = Resources.getResourceAsReader("shfq/mybatis-config.xml");
@@ -36,6 +37,26 @@ public class PeopleMapperTest {
                 session.close();
             }
         }
+
+    }
+
+    private static void queryPetByMapper() {
+//        SqlSession session = null;
+//        try {
+//            Reader reader = Resources.getResourceAsReader("shfq/mybatis-config.xml");
+//            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+//            session = sqlSessionFactory.openSession();
+//            PetMapper mapper = session.getMapper(PetMapper.class);
+//            Pet pet = mapper.selectPet(1);
+//            System.out.println("");
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            if (session != null) {
+//                session.close();
+//            }
+//        }
 
     }
 }

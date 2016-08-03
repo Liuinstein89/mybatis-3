@@ -333,9 +333,11 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     if (resultObject != null && !typeHandlerRegistry.hasTypeHandler(resultMap.getType())) {
       final MetaObject metaObject = configuration.newMetaObject(resultObject);
       boolean foundValues = !resultMap.getConstructorResultMappings().isEmpty();
+      // 自动映射通过反射调用 set 方法设置属性值（给没有映射过的列设置属性值）
       if (shouldApplyAutomaticMappings(resultMap, false)) {
         foundValues = applyAutomaticMappings(rsw, resultMap, metaObject, null) || foundValues;
       }
+      // 给属性映射设置值 其中 属性映射 构造方法映射 自动映射这三者没有交集
       foundValues = applyPropertyMappings(rsw, resultMap, metaObject, lazyLoader, null) || foundValues;
       foundValues = lazyLoader.size() > 0 || foundValues;
       resultObject = foundValues ? resultObject : null;
@@ -405,7 +407,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     }
   }
 
-  // todo 给对象设置所有的属性值
+  // todo 给对象设置所有的属性值 没有映射过的列名设置属性值
   private boolean applyAutomaticMappings(ResultSetWrapper rsw, ResultMap resultMap, MetaObject metaObject, String columnPrefix) throws SQLException {
     final List<String> unmappedColumnNames = rsw.getUnmappedColumnNames(resultMap, columnPrefix);
     boolean foundValues = false;

@@ -44,6 +44,7 @@ public final class MappedStatement {
   private SqlSource sqlSource;
   private Cache cache;
   private ParameterMap parameterMap;
+  // todo ?????一条 MappedStatement 可能对应着多个 ResultMap 在什么时候会对应着多个 ResultMap 呢？？？？？
   private List<ResultMap> resultMaps;
   private boolean flushCacheRequired;
   private boolean useCache;
@@ -280,6 +281,7 @@ public final class MappedStatement {
   public BoundSql getBoundSql(Object parameterObject) {
     BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
     List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
+    // todo ??? 为什么要重新 new 一个 BoundSql 呢？？？
     if (parameterMappings == null || parameterMappings.isEmpty()) {
       boundSql = new BoundSql(configuration, boundSql.getSql(), parameterMap.getParameterMappings(), parameterObject);
     }

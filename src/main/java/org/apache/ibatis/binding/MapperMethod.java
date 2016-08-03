@@ -57,14 +57,18 @@ public class MapperMethod {
       Object param = method.convertArgsToSqlCommandParam(args);
       result = rowCountResult(sqlSession.delete(command.getName(), param));
     } else if (SqlCommandType.SELECT == command.getType()) {
+      // todo 为什么返回类型为空 同时却有 ResultHandler
       if (method.returnsVoid() && method.hasResultHandler()) {
         executeWithResultHandler(sqlSession, args);
         result = null;
       } else if (method.returnsMany()) {
+        // 返回 List
         result = executeForMany(sqlSession, args);
       } else if (method.returnsMap()) {
+        // 返回 Map
         result = executeForMap(sqlSession, args);
       } else {
+        // 返回普通对象
         Object param = method.convertArgsToSqlCommandParam(args);
         result = sqlSession.selectOne(command.getName(), param);
       }
@@ -217,6 +221,7 @@ public class MapperMethod {
     }
   }
 
+  // 对 Method 进行了封装
   public static class MethodSignature {
 
     // 返回是数组或 list 或 数组 但不是 map
