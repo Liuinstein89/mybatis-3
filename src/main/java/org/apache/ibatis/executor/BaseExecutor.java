@@ -142,7 +142,7 @@ public abstract class BaseExecutor implements Executor {
     }
     List<E> list;
     try {
-      // queryStack 为什么要 ++
+      // queryStack 为什么要 ++ 因为在查询的过程中会有递归调用，query() 方法会间接地调用自己，queryStack 表示的是调用自己的次数
       queryStack++;
       // todo 为什么 resultHandler 为空的时候要查缓存
       list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
@@ -152,10 +152,12 @@ public abstract class BaseExecutor implements Executor {
         list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);
       }
     } finally {
-      // queryStack 为什么要 --
+      // queryStack 为什么要 -- 从 queryStack++ 到 queryStack-- 是一个完整的查询过程，已经把结果集转化为具体的对象了。
+      // 当 queryStack == 0 时表示所有的查询已经结束了，在查询的过程中可能使用了缓存，所有的查询结束之后会把需要设置的属性都设置。
       queryStack--;
     }
     if (queryStack == 0) {
+      // 有些对象的属性是一个从数据库里查询出来的对象，防止同一个对象多次查询，所以用了缓存，等到查询结束之后会把对象设置到对象中。
       for (DeferredLoad deferredLoad : deferredLoads) {
         deferredLoad.load();
       }
@@ -297,11 +299,12 @@ public abstract class BaseExecutor implements Executor {
 
   private <E> List<E> queryFromDatabase(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
     List<E> list;
-    // todo 为什么要用临时占位呢?????
+    // todo 为什么要用临时占位呢????? 正在查询对象，对象还没有查询出来，此时用临时占位，在查询的过程中有可能再次需要查询该对象，用临时占位符，表示该对象已经在缓存中
     localCache.putObject(key, EXECUTION_PLACEHOLDER);
     try {
       list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);
     } finally {
+      // 因为真正的对象已经查询出来了，所以移除临时占位对象
       localCache.removeObject(key);
     }
     localCache.putObject(key, list);
@@ -327,10 +330,14 @@ public abstract class BaseExecutor implements Executor {
   
   private static class DeferredLoad {
 
+    // MetaObject 封装了某一个对象，这个对象的一个属性需要延迟加载
     private final MetaObject resultObject;
+    // 需要延迟加载的属性
     private final String property;
+    // 需要延迟加载的属性的 java 类型
     private final Class<?> targetType;
     private final CacheKey key;
+    // 局部永久缓存 什么是永久缓存？ java 中有四种引用 强引用、软引用、弱引用、虚引用，其中用强引用做缓存就是永久缓存
     private final PerpetualCache localCache;
     private final ObjectFactory objectFactory;
     private final ResultExtractor resultExtractor;

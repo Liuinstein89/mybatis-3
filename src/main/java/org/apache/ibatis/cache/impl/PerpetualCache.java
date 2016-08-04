@@ -15,15 +15,18 @@
  */
 package org.apache.ibatis.cache.impl;
 
+import org.apache.ibatis.cache.Cache;
+import org.apache.ibatis.cache.CacheException;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 
-import org.apache.ibatis.cache.Cache;
-import org.apache.ibatis.cache.CacheException;
-
 /**
  * @author Clinton Begin
+ *
+ * 什么是永久缓存？ java 中有四种引用 强引用、软引用、弱引用、虚引用，其中用强引用做缓存就是永久缓存。永久引用所引用的对象不会被 GC 回收
+ *
  */
 public class PerpetualCache implements Cache {
 
