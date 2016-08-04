@@ -3,7 +3,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace = "people">
 
-    <select id="selectPeople" parameterType="int">
-        SELECT * FROM people people, pet pet WHERE people.id=#{id} AND pet.owner_id=people.id
+    <resultMap id="peopleResultMap" type="shfq.one_many_annotation.People">
+        <id column="people_id" property="id"></id>
+        <result column="name" property="name"></result>
+        <collection column="pet_id" property="pets" ofType="shfq.one_many_annotation.Pet">
+            <id column="pet_id" property="id"></id>
+            <result column="name" property="name"></result>
+            <association property="owner" column="owner_id" resultMap="peopleResultMap"></association>
+        </collection>
+    </resultMap>
+    <select id="selectPeople" parameterType="int" resultMap="peopleResultMap">
+        SELECT people.id as people_id, people.name, pet.id as pet_id, pet.name, pet.owner_id FROM people people, pet pet WHERE people.id=#{id} AND pet.owner_id=people.id
     </select>
 </mapper>
