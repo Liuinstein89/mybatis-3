@@ -21,7 +21,7 @@ public class PeopleTest {
             SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
             SqlSession session = sqlSessionFactory.openSession();
             // query student data
-            Object people = session.selectList("people.selectPeople", 1);
+            Object people = session.selectList("shfq.one_many_annotation.People.selectPeople", 1);
             System.out.println("record queried successfully");
             session.commit();
             session.close();
