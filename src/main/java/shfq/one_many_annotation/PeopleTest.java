@@ -13,7 +13,8 @@ import java.io.Reader;
  */
 public class PeopleTest {
     public static void main(String[] args) {
-        testQuery();
+//        testQuery();
+        findNum();
     }
     public static void testQuery() {
         try {
@@ -29,5 +30,32 @@ public class PeopleTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void findNum() {
+        int i = 0;
+        while (true) {
+            int sum = sum(i);
+            if (sum1(sum) == 50) {
+                System.out.println(i);
+                return;
+            } else {
+                i++;
+            }
+
+        }
+    }
+
+    private static int sum(int beginNum) {
+        return  (beginNum + beginNum + 999)*1000 / 2;
+    }
+
+    private static int sum1(int num) {
+        String s = String.valueOf(num);
+        int sum = 0;
+        for (int i = 0; i < s.length(); i++) {
+            sum += Integer.parseInt(s.substring(i, i + 1));
+        }
+        return sum;
     }
 }

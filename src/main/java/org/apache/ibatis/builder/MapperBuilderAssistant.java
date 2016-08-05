@@ -33,7 +33,7 @@ import java.util.*;
  * @author Clinton Begin
  */
 public class MapperBuilderAssistant extends BaseBuilder {
-
+  // 当前解析的 mapper 的命名空间 可能是 xml 文件的命名空间也可能是 包名.类名
   private String currentNamespace;
   private String resource;
   private Cache currentCache;

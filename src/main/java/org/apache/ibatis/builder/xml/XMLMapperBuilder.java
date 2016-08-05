@@ -96,6 +96,7 @@ public class XMLMapperBuilder extends BaseBuilder {
       builderAssistant.setCurrentNamespace(namespace);
       cacheRefElement(context.evalNode("cache-ref"));
       cacheElement(context.evalNode("cache"));
+      // 老式风格的参数映射，以后可能会移除
       parameterMapElement(context.evalNodes("/mapper/parameterMap"));
       // todo 解析 resultMap
       resultMapElements(context.evalNodes("/mapper/resultMap"));
@@ -240,10 +241,13 @@ public class XMLMapperBuilder extends BaseBuilder {
     return resultMapElement(resultMapNode, Collections.<ResultMapping> emptyList());
   }
 
+  // <resultMap> 标签只有 id type autoMapping 三个属性
   private ResultMap resultMapElement(XNode resultMapNode, List<ResultMapping> additionalResultMappings) throws Exception {
     ErrorContext.instance().activity("processing " + resultMapNode.getValueBasedIdentifier());
     String id = resultMapNode.getStringAttribute("id",
         resultMapNode.getValueBasedIdentifier());
+    // 是不是旧版的 mybatis 有其他属性所以要这样写，就现在而言下面的这行代码可以简化为
+    // String type = resultMapNode.getStringAttribute("type",null);
     String type = resultMapNode.getStringAttribute("type",
         resultMapNode.getStringAttribute("ofType",
             resultMapNode.getStringAttribute("resultType",
