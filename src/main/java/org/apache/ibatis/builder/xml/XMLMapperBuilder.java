@@ -241,7 +241,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     return resultMapElement(resultMapNode, Collections.<ResultMapping> emptyList());
   }
 
-  // <resultMap> 标签只有 id type autoMapping 三个属性
+  // <resultMap> 标签只有 id type autoMapping extends 四个属性
   private ResultMap resultMapElement(XNode resultMapNode, List<ResultMapping> additionalResultMappings) throws Exception {
     ErrorContext.instance().activity("processing " + resultMapNode.getValueBasedIdentifier());
     String id = resultMapNode.getStringAttribute("id",
@@ -266,10 +266,13 @@ public class XMLMapperBuilder extends BaseBuilder {
       } else if ("discriminator".equals(resultChild.getName())) {
         discriminator = processDiscriminatorElement(resultChild, typeClass, resultMappings);
       } else {
+        // association collection id result
         List<ResultFlag> flags = new ArrayList<ResultFlag>();
+        // id
         if ("id".equals(resultChild.getName())) {
           flags.add(ResultFlag.ID);
         }
+        // association collection result
         resultMappings.add(buildResultMappingFromContext(resultChild, typeClass, flags));
       }
     }
@@ -284,6 +287,14 @@ public class XMLMapperBuilder extends BaseBuilder {
 
   private void processConstructorElement(XNode resultChild, Class<?> resultType, List<ResultMapping> resultMappings) throws Exception {
     List<XNode> argChildren = resultChild.getChildren();
+    // idArg 或 arg
+    // 构造方法的参数必须要按照顺序传 比如一个构造方法有三个参数都是 String 类型，因为没有办法获取到参数名称，只能根据顺序传递
+    // 所以构造方法中的子元素 idArg 和 arg 元素都没有 property 属性
+    // todo notNullColumn ???????
+    // columnPrefix
+    // foreignColumn
+    // resultSet
+    // fetchType
     for (XNode argChild : argChildren) {
       List<ResultFlag> flags = new ArrayList<ResultFlag>();
       flags.add(ResultFlag.CONSTRUCTOR);
@@ -357,6 +368,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     String javaType = context.getStringAttribute("javaType");
     String jdbcType = context.getStringAttribute("jdbcType");
     String nestedSelect = context.getStringAttribute("select");
+    // todo 嵌套 resultMap 为什么 <constructor/> 标签没有 association collection case
     String nestedResultMap = context.getStringAttribute("resultMap",
         processNestedResultMappings(context, Collections.<ResultMapping> emptyList()));
     String notNullColumn = context.getStringAttribute("notNullColumn");

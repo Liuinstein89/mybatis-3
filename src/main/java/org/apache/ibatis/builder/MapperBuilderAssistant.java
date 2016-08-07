@@ -375,10 +375,11 @@ public class MapperBuilderAssistant extends BaseBuilder {
       String foreignColumn,
       boolean lazy) {
     Class<?> javaTypeClass = resolveResultJavaType(resultType, property, javaType);
+    //// todo 不太清楚
     TypeHandler<?> typeHandlerInstance = resolveTypeHandler(javaTypeClass, typeHandler);
     List<ResultMapping> composites = parseCompositeColumnName(column);
     if (composites.size() > 0) {
-      // 说明是外键，关联了一个对象，所以把 column 置空
+      // todo ?????说明是外键，关联了一个对象，所以把 column 置空
       column = null;
     }
     ResultMapping.Builder builder = new ResultMapping.Builder(configuration, property, column, javaTypeClass);
@@ -396,6 +397,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
     return builder.build();
   }
 
+  // 和下面的方法类似都是解析多个列名
   private Set<String> parseMultipleColumnNames(String columnName) {
     Set<String> columns = new HashSet<String>();
     if (columnName != null) {
@@ -413,6 +415,9 @@ public class MapperBuilderAssistant extends BaseBuilder {
   }
 
   // todo 应该解析的是外键列名  column = "{courseId=id,userId=user_id}
+  // todo 组合键 根据几个组合键最终查询出一个对象？？？？？？？？？？
+  // http://stackoverflow.com/questions/17193040/passing-multiple-columns-in-mybatis-assoctiation
+  // http://mybatis-user.963551.n3.nabble.com/Collection-mapping-with-Composite-primary-key-td4026256.html
   private List<ResultMapping> parseCompositeColumnName(String columnName) {
     List<ResultMapping> composites = new ArrayList<ResultMapping>();
     if (columnName != null && (columnName.indexOf('=') > -1 || columnName.indexOf(',') > -1)) {
