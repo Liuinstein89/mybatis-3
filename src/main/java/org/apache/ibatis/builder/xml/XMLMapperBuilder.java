@@ -306,6 +306,10 @@ public class XMLMapperBuilder extends BaseBuilder {
   }
 
   private Discriminator processDiscriminatorElement(XNode context, Class<?> resultType, List<ResultMapping> resultMappings) throws Exception {
+    // 根据某一列的值来确定需要的类型
+    // <discriminator/> 只有一种子标签即 <case> case 根据不同的值确定返回的类型 值是由 value 属性来确定的
+    // 返回类型是由 resultType 或 resultMap 来确定的
+
     String column = context.getStringAttribute("column");
     String javaType = context.getStringAttribute("javaType");
     String jdbcType = context.getStringAttribute("jdbcType");
