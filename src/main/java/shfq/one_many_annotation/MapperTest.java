@@ -15,8 +15,8 @@ import java.io.Reader;
  */
 public class MapperTest {
     public static void main(String[] args) {
-        queryPeopleByMapper();
-//        queryPetByMapper();
+//        queryPeopleByMapper();
+        queryPetByMapper();
 
     }
 
@@ -41,22 +41,22 @@ public class MapperTest {
     }
 
     private static void queryPetByMapper() {
-//        SqlSession session = null;
-//        try {
-//            Reader reader = Resources.getResourceAsReader("shfq/mybatis-config.xml");
-//            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
-//            session = sqlSessionFactory.openSession();
-//            PetMapper mapper = session.getMapper(PetMapper.class);
-//            Pet pet = mapper.selectPet(1);
-//            System.out.println("");
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            if (session != null) {
-//                session.close();
-//            }
-//        }
+        SqlSession session = null;
+        try {
+            Reader reader = Resources.getResourceAsReader("shfq/mybatis-config.xml");
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+            session = sqlSessionFactory.openSession();
+            PetMapper mapper = session.getMapper(PetMapper.class);
+            Pet pet = mapper.selectPet(1);
+            System.out.println("");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
 
     }
 }

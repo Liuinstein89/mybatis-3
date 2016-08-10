@@ -17,9 +17,9 @@ public interface PetMapper {
     @Select("select * from pet where owner_id=#{ownerId}")
     List<Pet> selectPets(int ownerId);
 
-//    @Results(value = {@Result(column = "owner_id", property = "owner", one = @One(select = "shfq.one_many_annotation.PeopleMapper.selectPeople"))})
-//    @Select("select * from pet where id=#{id}")
-//    Pet selectPet(int id);
+    @Results(value = {@Result(column = "owner_id", property = "owner", one = @One(select = "shfq.one_many_annotation.PeopleMapper.selectPeople"))})
+    @Select("select * from pet where id=#{id}")
+    Pet selectPet(int id);
 
 
 }

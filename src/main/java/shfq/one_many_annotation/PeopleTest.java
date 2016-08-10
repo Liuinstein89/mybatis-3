@@ -13,8 +13,8 @@ import java.io.Reader;
  */
 public class PeopleTest {
     public static void main(String[] args) {
-//        testQuery();
-        findNum();
+        testQuery();
+//        findNum();
     }
     public static void testQuery() {
         try {

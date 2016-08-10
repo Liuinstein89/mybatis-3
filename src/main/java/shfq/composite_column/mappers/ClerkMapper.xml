@@ -1,0 +1,25 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "shfq.composite_column.Clerk">
+    <resultMap id="clerkAddressResultMap" type="shfq.composite_column.ClerkAddress">
+        <id column="clerk_street_no" property="streetNo"></id>
+        <id column="clerk_house_no" property="houseNo"></id>
+        <result column="street_name" property="streetName"></result>
+    </resultMap>
+    <!--<resultMap id="clerkResultMap" type="shfq.composite_column.Clerk">-->
+        <!--<id column="id" property="id"></id>-->
+        <!--<result column="name" property="name"></result>-->
+        <!--<association property="clerkAddress" column="{streetNo=address_street_no,houseNo=address_house_no}" resultMap="clerkAddressResultMap" />-->
+    <!--</resultMap>-->
+
+    <resultMap id="clerkResultMap" type="shfq.composite_column.Clerk">
+        <id column="id" property="id"></id>
+        <result column="name" property="name"></result>
+        <association property="clerkAddress" resultMap="clerkAddressResultMap" />
+    </resultMap>
+
+    <select id="selectClerk" parameterType="int" resultMap="clerkResultMap">
+        SELECT clerk.id, clerk.name, clerk.street_no as clerk_street_no, clerk.house_no as clerk_house_no, address.street_no as address_street_no, address.house_no as address_house_no, address.street_name from clerk clerk, clerk_address address WHERE clerk.id=#{id} and clerk.street_no=address.street_no and clerk.house_no=address.house_no
+    </select>
+</mapper>
