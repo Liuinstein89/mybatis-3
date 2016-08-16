@@ -1,4 +1,4 @@
-package shfq.vo;
+package shfq.discriminator.vo;
 
 /**
  * author:      shfq

@@ -1,10 +1,10 @@
-package shfq;
+package shfq.discriminator.mappers;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import shfq.vo.Vehicle;
+import shfq.discriminator.vo.Vehicle;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -17,13 +17,12 @@ import java.io.Reader;
 public class VehicleMapperTest {
     public static void main(String[] args) {
         Vehicle vehicle1 = query(1);
-        Vehicle vehicle2 = query(2);
         System.out.println("test");
     }
     private static Vehicle query(int id) {
         SqlSession session = null;
         try {
-            Reader reader = Resources.getResourceAsReader("shfq/mybatis-config.xml");
+            Reader reader = Resources.getResourceAsReader("shfq/discriminator/mappers/xml/mybatis-config.xml");
             SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
             session = sqlSessionFactory.openSession();
             VehicleMapper vehicleMapper = session.getMapper(VehicleMapper.class);

@@ -1,0 +1,24 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="shfq.discriminator.vo.Vehicle">
+    <resultMap id="vehicleResultMap" type="shfq.discriminator.vo.Vehicle">
+        <discriminator javaType="String" column="type">
+            <case value="car" resultType="shfq.discriminator.vo.Car"/>
+            <case value="bus" resultType="shfq.discriminator.vo.Bus"/>
+        </discriminator>
+    </resultMap>
+    <!--<resultMap id="carResultMap" type="shfq.discriminator.vo.Car">-->
+        <!--<id property="id" column="id"></id>-->
+        <!--<result property="no" column="no"></result>-->
+        <!--<result property="name" column="name"/>-->
+    <!--</resultMap>-->
+    <!--<resultMap id="busResultMap" type="shfq.discriminator.vo.Bus">-->
+        <!--<id property="id" column="id"></id>-->
+        <!--<result property="no" column="no"></result>-->
+        <!--<result property="name" column="name"/>-->
+    <!--</resultMap>-->
+    <select id="selectVehicle" parameterType="int" resultMap="vehicleResultMap">
+        SELECT * FROM vehicle where id=#{id}
+    </select>
+</mapper>

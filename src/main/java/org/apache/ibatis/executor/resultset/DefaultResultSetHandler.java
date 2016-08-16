@@ -140,7 +140,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     List<ResultMap> resultMaps = mappedStatement.getResultMaps();
     int resultMapCount = resultMaps.size();
     validateResultMapsCount(rsw, resultMapCount);
-    // todo 处理结果集，mybatis 有可能一次查询返回多个结果集。
+    // todo 处理结果集，mybatis 有可能一次查询返回多个结果集。好像是存储过程可以返回多个结果集，其他情况下不知道会不会返回多个结果集。
     while (rsw != null && resultMapCount > resultSetCount) {
       ResultMap resultMap = resultMaps.get(resultSetCount);
       handleResultSet(rsw, resultMap, multipleResults, null);

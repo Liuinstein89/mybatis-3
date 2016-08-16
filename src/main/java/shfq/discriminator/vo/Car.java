@@ -1,9 +1,10 @@
-package shfq.vo;
+package shfq.discriminator.vo;
 
 /**
  * author:      shfq
  * description:
  * create date: 2016/8/1.
  */
-public class Bus extends Vehicle {
+public class Car extends Vehicle {
+
 }

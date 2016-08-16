@@ -252,6 +252,7 @@ public class XMLMapperBuilder extends BaseBuilder {
         resultMapNode.getStringAttribute("ofType",
             resultMapNode.getStringAttribute("resultType",
                 resultMapNode.getStringAttribute("javaType"))));
+
     String extend = resultMapNode.getStringAttribute("extends");
     Boolean autoMapping = resultMapNode.getBooleanAttribute("autoMapping");
     Class<?> typeClass = resolveClass(type);
@@ -272,7 +273,7 @@ public class XMLMapperBuilder extends BaseBuilder {
         if ("id".equals(resultChild.getName())) {
           flags.add(ResultFlag.ID);
         }
-        // association collection result
+        // association collection result id
         resultMappings.add(buildResultMappingFromContext(resultChild, typeClass, flags));
       }
     }
@@ -318,6 +319,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     @SuppressWarnings("unchecked")
     Class<? extends TypeHandler<?>> typeHandlerClass = (Class<? extends TypeHandler<?>>) resolveClass(typeHandler);
     JdbcType jdbcTypeEnum = resolveJdbcType(jdbcType);
+    // 根据某一列的值来确定需要返回的 resultMap 进而确定了返回的 java class 的类型
     Map<String, String> discriminatorMap = new HashMap<String, String>();
     for (XNode caseChild : context.getChildren()) {
       String value = caseChild.getStringAttribute("value");
@@ -365,7 +367,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     return true;
   }
 
-  // todo 处理一个字段的映射
+  // 处理 association collection id result 的映射
   private ResultMapping buildResultMappingFromContext(XNode context, Class<?> resultType, List<ResultFlag> flags) throws Exception {
     String property = context.getStringAttribute("property");
     String column = context.getStringAttribute("column");
@@ -373,8 +375,14 @@ public class XMLMapperBuilder extends BaseBuilder {
     String jdbcType = context.getStringAttribute("jdbcType");
     String nestedSelect = context.getStringAttribute("select");
     // todo 嵌套 resultMap 为什么 <constructor/> 标签没有 association collection case
+    // association 和 collection case 会有 resultMap 但 association 和 collection 要么有 resultMap 要么有 select 但 case 一定会有 resultMap 但没有 select
+    // 为什么呢？是因为 case 是 discriminator 的一个子元素 通过 case 来确定一个映射对象的类型。resultMap 本身代表着结果集与一个返回对象之间的映射，resultMap 关联着一个直接的返回对象，通过 case 来确定这个直接返回对象的类型
+    // 而 association 和 collection 其实是直接返回对象的一个属性，这个属性可能随着联合查询的结果集一次性查出，也可能先查出 resultMap 的主体，再一次查询出 association 或 collection 属性，还有可能懒加载这些属性，在这些属性真正需要使用的时候才去查。
+
+    // 处理嵌套 resultMap nestedResultMap 是嵌套结果集的 id
     String nestedResultMap = context.getStringAttribute("resultMap",
         processNestedResultMappings(context, Collections.<ResultMapping> emptyList()));
+
     String notNullColumn = context.getStringAttribute("notNullColumn");
     String columnPrefix = context.getStringAttribute("columnPrefix");
     String typeHandler = context.getStringAttribute("typeHandler");
@@ -387,7 +395,14 @@ public class XMLMapperBuilder extends BaseBuilder {
     JdbcType jdbcTypeEnum = resolveJdbcType(jdbcType);
     return builderAssistant.buildResultMapping(resultType, property, column, javaTypeClass, jdbcTypeEnum, nestedSelect, nestedResultMap, notNullColumn, columnPrefix, typeHandlerClass, flags, resulSet, foreignColumn, lazy);
   }
-  
+
+  /**
+   * 处理嵌套结果集映射 这是一个间接递归调用方法 processNestedResultMappings->resultMapElement->buildResultMappingFromContext->processNestedResultMappings
+   * @param context
+   * @param resultMappings
+   * @return
+   * @throws Exception
+   */
   private String processNestedResultMappings(XNode context, List<ResultMapping> resultMappings) throws Exception {
     if ("association".equals(context.getName())
         || "collection".equals(context.getName())

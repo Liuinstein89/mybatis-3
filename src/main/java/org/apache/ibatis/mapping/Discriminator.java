@@ -15,13 +15,14 @@
  */
 package org.apache.ibatis.mapping;
 
+import org.apache.ibatis.session.Configuration;
+
 import java.util.Collections;
 import java.util.Map;
 
-import org.apache.ibatis.session.Configuration;
-
 /**
  * @author Clinton Begin
+ * Discriminator 本质上是一个 ResultMapping ，只不过这个 ResultMapping 映射的是用户自定义的一个复杂的对象
  */
 public class Discriminator {
 

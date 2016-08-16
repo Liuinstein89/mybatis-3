@@ -205,6 +205,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
       JdbcType jdbcType,
       Class<? extends TypeHandler<?>> typeHandler,
       Map<String, String> discriminatorMap) {
+    // 怎么解决的
     ResultMapping resultMapping = buildResultMapping(
         resultType,
         null,
@@ -220,6 +221,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
         null,
         null,
         false);
+
     Map<String, String> namespaceDiscriminatorMap = new HashMap<String, String>();
     for (Map.Entry<String, String> e : discriminatorMap.entrySet()) {
       String resultMap = e.getValue();
@@ -379,7 +381,9 @@ public class MapperBuilderAssistant extends BaseBuilder {
     TypeHandler<?> typeHandlerInstance = resolveTypeHandler(javaTypeClass, typeHandler);
     List<ResultMapping> composites = parseCompositeColumnName(column);
     if (composites.size() > 0) {
-      // todo ?????说明是外键，关联了一个对象，所以把 column 置空
+      // todo 组合列 一般在 collection 或 association 中有 select 的情况下才会用组合列，组合列的目的就是为 select 语句提供参数传递，一般有联合主键的情况下才会用到组合列
+      // 比如说 a class 中有个 b class 属性，b class 的主键是由两个字段组成的，a 在数据库表中的记录中有 b 的两个主键字段，所以通过这两个主键字段可以查询出 a 记录关联的 b 记录
+      // 这就是组合列的使用场景
       column = null;
     }
     ResultMapping.Builder builder = new ResultMapping.Builder(configuration, property, column, javaTypeClass);
