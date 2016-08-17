@@ -242,6 +242,7 @@ public class XMLMapperBuilder extends BaseBuilder {
   }
 
   // <resultMap> 标签只有 id type autoMapping extends 四个属性
+  // XNode 可能是 <resultMap> <case> <association> <collection>
   private ResultMap resultMapElement(XNode resultMapNode, List<ResultMapping> additionalResultMappings) throws Exception {
     ErrorContext.instance().activity("processing " + resultMapNode.getValueBasedIdentifier());
     String id = resultMapNode.getStringAttribute("id",
