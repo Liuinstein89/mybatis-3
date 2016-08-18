@@ -247,8 +247,10 @@ public class XMLMapperBuilder extends BaseBuilder {
     ErrorContext.instance().activity("processing " + resultMapNode.getValueBasedIdentifier());
     String id = resultMapNode.getStringAttribute("id",
         resultMapNode.getValueBasedIdentifier());
-    // 是不是旧版的 mybatis 有其他属性所以要这样写，就现在而言下面的这行代码可以简化为
-    // String type = resultMapNode.getStringAttribute("type",null);
+    // <resultMap> 标签中会有 type
+    // <case> 标签中会有 resultType
+    // <collection> 标签中会有 javaType ofType
+    // <association> 标签中会有 javaType
     String type = resultMapNode.getStringAttribute("type",
         resultMapNode.getStringAttribute("ofType",
             resultMapNode.getStringAttribute("resultType",

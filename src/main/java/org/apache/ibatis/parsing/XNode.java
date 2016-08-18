@@ -70,6 +70,8 @@ public class XNode {
     return builder.toString();
   }
 
+  // 父标签的 name([父的id/value/property 之一 前面的优先级高])_子标签的 name([子标签的id/value/property 之一 前面的优先级高])
+  // 一直递归应用
   public String getValueBasedIdentifier() {
     StringBuilder builder = new StringBuilder();
     XNode current = this;
@@ -77,6 +79,7 @@ public class XNode {
       if (current != this) {
         builder.insert(0, "_");
       }
+      // <case> 会有 value
       String value = current.getStringAttribute("id",
           current.getStringAttribute("value",
               current.getStringAttribute("property", null)));
