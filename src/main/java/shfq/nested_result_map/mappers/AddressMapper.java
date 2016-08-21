@@ -1,10 +1,11 @@
-package shfq;
+package shfq.nested_result_map.mappers;
 
 import org.apache.ibatis.annotations.Arg;
 import org.apache.ibatis.annotations.ConstructorArgs;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.type.IntegerTypeHandler;
 import org.apache.ibatis.type.JdbcType;
+import shfq.nested_result_map.vo.Address;
 
 /**
  * author:      shfq

@@ -1,41 +1,39 @@
-package shfq;
+package shfq.nested_result_map.xml;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import shfq.nested_result_map.vo.Address;
 
 import java.io.IOException;
 import java.io.Reader;
 
 /**
- * author:      shfq
- * description:
- * create date: 2016/7/28.
+ * Created by shfq on 2016/8/21.
  */
-public class AddressMapperTest {
+public class AddressTest {
     public static void main(String[] args) {
-        queryByMapper();
-
+        test();
     }
-
-    private static void queryByMapper() {
+    private static void test() {
         SqlSession session = null;
         try {
-            Reader reader = Resources.getResourceAsReader("shfq/mybatis-config.xml");
+            Reader reader = Resources.getResourceAsReader("shfq/nested_result_map/xml/mybatis-config.xml");
             SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
             session = sqlSessionFactory.openSession();
-            AddressMapper mapper = session.getMapper(AddressMapper.class);
-            Address address = mapper.selectAddress(1);
-            System.out.println(address.getName());
+            Address address = session.selectOne("shfq.nested_result_map.xml.address.selectAddress", 1);
 
+            System.out.println("");
+
+            session.commit();
         } catch (IOException e) {
+            session.rollback();
             e.printStackTrace();
         } finally {
             if (session != null) {
                 session.close();
             }
         }
-
     }
 }

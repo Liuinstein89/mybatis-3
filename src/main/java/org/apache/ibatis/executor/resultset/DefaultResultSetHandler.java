@@ -707,6 +707,8 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   public ResultMap resolveDiscriminatedResultMap(ResultSet rs, ResultMap resultMap, String columnPrefix) throws SQLException {
     Set<String> pastDiscriminators = new HashSet<String>();
     Discriminator discriminator = resultMap.getDiscriminator();
+    // todo 为什么要循环呢？一个 resultMap 中可能会有多个 discriminator
+    // resultMap 中含有 discriminator discriminator 又确定了一个 discriminator
     while (discriminator != null) {
       final Object value = getDiscriminatorValue(rs, discriminator, columnPrefix);
       final String discriminatedMapId = discriminator.getMapIdFor(String.valueOf(value));

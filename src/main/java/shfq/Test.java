@@ -19,6 +19,8 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import shfq.nested_result_map.mappers.StudentMapper;
+import shfq.nested_result_map.vo.Student;
 
 import java.io.IOException;
 import java.io.Reader;

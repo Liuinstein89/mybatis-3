@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package shfq;
+package shfq.nested_result_map.mappers;
 
 import org.apache.ibatis.annotations.Arg;
 import org.apache.ibatis.annotations.ConstructorArgs;
@@ -21,6 +21,7 @@ import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.type.IntegerTypeHandler;
 import org.apache.ibatis.type.JdbcType;
+import shfq.nested_result_map.vo.Student;
 
 import java.util.Map;
 

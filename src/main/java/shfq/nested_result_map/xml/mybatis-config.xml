@@ -43,6 +43,6 @@
         </environment>
     </environments>
     <mappers>
-        <mapper resource="shfq/discriminator/xml/vehicleMapper.xml"/>
+        <mapper resource="shfq/nested_result_map/xml/addressMapper.xml"/>
     </mappers>
 </configuration>

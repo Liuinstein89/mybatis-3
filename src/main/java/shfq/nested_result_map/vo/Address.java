@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package shfq;
+package shfq.nested_result_map.vo;
 
 import java.io.Serializable;
 
@@ -26,6 +26,9 @@ public class Address implements Serializable {
     private int id;
     private String name;
     private String postCode;
+
+    public Address() {
+    }
 
     public Address(int id) {
         this.id = id;

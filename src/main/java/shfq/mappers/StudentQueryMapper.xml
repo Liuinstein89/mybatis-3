@@ -2,7 +2,7 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace = "queryStudent">
-    <resultMap id = "result" type = "shfq.Student">
+    <resultMap id = "result" type = "shfq.nested_result_map.vo.Student">
         <result property = "id" column = "student_ID"/>
         <result property = "name" column = "student_NAME"/>
         <result property = "branch" column = "student_BRANCH"/>
@@ -13,7 +13,7 @@
 
     </resultMap>
 
-    <resultMap id = "studentResult" type = "shfq.Student">
+    <resultMap id = "studentResult" type = "shfq.nested_result_map.vo.Student">
         <result property = "id" column = "student_ID"/>
         <result property = "name" column = "student_NAME"/>
         <result property = "branch" column = "student_BRANCH"/>
@@ -24,13 +24,13 @@
     </resultMap>
 
 
-    <resultMap id="address" type="shfq.Address">
+    <resultMap id="address" type="shfq.nested_result_map.vo.Address">
         <result property="id" column="address_id"></result>
         <result property="name" column="address_name"></result>
         <result property="postCode" column="address_post_code"></result>
     </resultMap>
 
-    <select id = "getAll" resultType="shfq.Student">
+    <select id = "getAll" resultType="shfq.nested_result_map.vo.Student">
     SELECT id, name, phone, email FROM STUDENT;
     </select>
 
@@ -44,7 +44,7 @@
       from student s left outer join address a on s.address_id=a.id where s.id=#{id}
     </select>
 
-    <insert id = "insert" parameterType = "shfq.Student">
+    <insert id = "insert" parameterType = "shfq.nested_result_map.vo.Student">
         INSERT INTO STUDENT (NAME, BRANCH, PERCENTAGE, PHONE, EMAIL ) VALUES (#{name}, #{branch}, #{percentage}, #{phone}, #{email});
 
         <selectKey keyProperty = "id" resultType = "int" order = "AFTER">
@@ -55,7 +55,7 @@
     <delete id="deleteStudentById" parameterType="int">
         DELETE FROM student where id=#{id}
     </delete>
-    <update id="updateStudent" parameterType="shfq.Student">
+    <update id="updateStudent" parameterType="shfq.nested_result_map.vo.Student">
         UPDATE student
           <set>
               <if test="name != null">name=#{name}</if>

@@ -16,6 +16,7 @@
 package shfq;
 
 import org.apache.ibatis.annotations.*;
+import shfq.nested_result_map.vo.Student;
 
 /**
  * author:      shfq

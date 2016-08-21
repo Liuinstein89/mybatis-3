@@ -28,6 +28,7 @@ public class PropertyTokenizer implements Iterable<PropertyTokenizer>, Iterator<
 
   public PropertyTokenizer(String fullname) {
     int delim = fullname.indexOf('.');
+    // todo 什么时候下才需要 . ?
     if (delim > -1) {
       name = fullname.substring(0, delim);
       children = fullname.substring(delim + 1);
@@ -36,6 +37,7 @@ public class PropertyTokenizer implements Iterable<PropertyTokenizer>, Iterator<
       children = null;
     }
     indexedName = name;
+    // todo 什么时候下才会有 [ ?
     delim = name.indexOf('[');
     if (delim > -1) {
       index = name.substring(delim + 1, name.length() - 1);

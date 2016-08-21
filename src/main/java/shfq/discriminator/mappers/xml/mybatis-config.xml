@@ -29,7 +29,7 @@
         <setting name="mapUnderscoreToCamelCase" value="true"/>
     </settings>
     <typeAliases>
-        <typeAlias alias = "Student" type = "shfq.Student"/>
+        <typeAlias alias = "Student" type = "shfq.nested_result_map.vo.Student"/>
     </typeAliases>
     <environments default="development">
         <environment id="development">
