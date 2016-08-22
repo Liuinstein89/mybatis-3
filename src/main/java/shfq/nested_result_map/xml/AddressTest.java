@@ -22,7 +22,7 @@ public class AddressTest {
             Reader reader = Resources.getResourceAsReader("shfq/nested_result_map/xml/mybatis-config.xml");
             SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
             session = sqlSessionFactory.openSession();
-            Address address = session.selectOne("shfq.nested_result_map.xml.address.selectAddress", 1);
+            Address address = session.selectOne("shfq.nested_result_map.xml.address.selectAddressUseInclude", 1);
 
             System.out.println("");
 

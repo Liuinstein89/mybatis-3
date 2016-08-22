@@ -37,24 +37,38 @@ public class GenericTokenParser {
       int offset = 0;
       int start = text.indexOf(openToken, offset);
       // 循环解析多个参数
+      // 先确定 offset 再根据 start = text.indexOf(openToken, offset);
+      // 计算出 start
       while (start > -1) {
+        // 有转义字符 去掉转义字符
         if (start > 0 && src[start - 1] == '\\') {
           // the variable is escaped. remove the backslash.
           builder.append(src, offset, start - offset - 1).append(openToken);
           offset = start + openToken.length();
         } else {
           int end = text.indexOf(closeToken, start);
+          // 标签应该是成对儿出现的，结束标签如果不存在的话则说明解析已经完成
+          // 把 offset 置为 src.length 在循环的末尾处
+          // start = text.indexOf(openToken, offset);
+          // 所以 start 为 -1 ，退出循环
           if (end == -1) {
             builder.append(src, offset, src.length - offset);
             offset = src.length;
           } else {
+            // 找到了一对儿标签即 开始标签和结束标签
+            // 把从偏移量开始处追加 start-offset 个字符，其中不包括 start 对应的字符，也就是说不会追加 openToken 字符
             builder.append(src, offset, start - offset);
+            // 跳过 openToken
             offset = start + openToken.length();
+            // 解析出开始标签和结束标签之间的内容
             String content = new String(src, offset, end - offset);
+            // 处理内容结果 不同的 handler 有不同的处理策略
             builder.append(handler.handleToken(content));
+            // 重新计算偏移量 偏移量等于结束标签索引位置+结束标签的长度
             offset = end + closeToken.length();
           }
         }
+        // 处理一对儿标签结束，从下一个位置重新开始处理
         start = text.indexOf(openToken, offset);
       }
       // TODO 什么时候会出现这种情况 当结束标签不是在 text 的最末尾的时候会出现这种情况

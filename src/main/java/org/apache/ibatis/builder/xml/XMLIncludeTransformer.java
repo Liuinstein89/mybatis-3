@@ -82,14 +82,18 @@ public class XMLIncludeTransformer {
       }
       toInclude.getParentNode().removeChild(toInclude);
     } else if (source.getNodeType() == Node.ELEMENT_NODE) {
+      // 如果节点是元素节点的话则遍历其子元素递归应用 include
       NodeList children = source.getChildNodes();
       for (int i=0; i<children.getLength(); i++) {
         applyIncludes(children.item(i), variablesContext);
       }
     } else if (source.getNodeType() == Node.ATTRIBUTE_NODE && !variablesContext.isEmpty()) {
+      // 如果节点是属性节点同时属性变量结合不为空的话则把属性中的所有变量全部替换
       // replace variables in all attribute values
       source.setNodeValue(PropertyParser.parse(source.getNodeValue(), variablesContext));
     } else if (source.getNodeType() == Node.TEXT_NODE && !variablesContext.isEmpty()) {
+      // 如果节点是文本节点同时属性变量结合不为空的话则把属性中的所有变量全部替换
+
       // replace variables ins all text nodes
       source.setNodeValue(PropertyParser.parse(source.getNodeValue(), variablesContext));
     }
