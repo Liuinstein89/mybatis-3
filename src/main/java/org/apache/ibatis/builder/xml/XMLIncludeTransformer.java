@@ -76,6 +76,7 @@ public class XMLIncludeTransformer {
       if (toInclude.getOwnerDocument() != source.getOwnerDocument()) {
         toInclude = source.getOwnerDocument().importNode(toInclude, true);
       }
+      // 根据 curd 中的 <include> 所引用 sql id，把 <sql> 标签替换
       source.getParentNode().replaceChild(toInclude, source);
       while (toInclude.hasChildNodes()) {
         toInclude.getParentNode().insertBefore(toInclude.getFirstChild(), toInclude);
@@ -118,6 +119,9 @@ public class XMLIncludeTransformer {
    * @param node Include node instance
    * @param inheritedVariablesContext Current context used for replace variables in new variables values
    * @return variables context from include instance (no inherited values)
+   * 把 <include></include> 标签中的 <property name="name" value="value"></property>
+   * 属性中的 name 和 value 读取出来保存到 Properties 中
+   *
    */
   private Properties getVariablesContext(Node node, Properties inheritedVariablesContext) {
     Properties variablesContext = new Properties();
