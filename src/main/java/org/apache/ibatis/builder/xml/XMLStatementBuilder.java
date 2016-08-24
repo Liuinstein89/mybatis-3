@@ -83,9 +83,11 @@ public class XMLStatementBuilder extends BaseBuilder {
 
     // Include Fragments before parsing
     XMLIncludeTransformer includeParser = new XMLIncludeTransformer(configuration, builderAssistant);
+    // 应用 include 其实就是个替换的过程
     includeParser.applyIncludes(context.getNode());
 
     // Parse selectKey after includes and remove them.
+    // 只有 update 和 insert 才会有 selectKey
     processSelectKeyNodes(id, parameterTypeClass, langDriver);
     
     // Parse the SQL (pre: <selectKey> and <include> were parsed and removed)
