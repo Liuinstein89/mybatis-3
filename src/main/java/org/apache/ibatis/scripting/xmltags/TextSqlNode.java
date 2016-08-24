@@ -40,7 +40,7 @@ public class TextSqlNode implements SqlNode {
   
   public boolean isDynamic() {
     DynamicCheckerTokenParser checker = new DynamicCheckerTokenParser();
-    // 判断是不是动态，如果 text 中含有 ${} 则会调用 handleToken() 调用该方法时会设置 isDynamic = true;
+    // 判断是不是动态，如果 text 中含有 ${} 则会调用 handleToken() 调用该方法时会设置 checker 中的 isDynamic = true;
     GenericTokenParser parser = createParser(checker);
     parser.parse(text);
     return checker.isDynamic();
