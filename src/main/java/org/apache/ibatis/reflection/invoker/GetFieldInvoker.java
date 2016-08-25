@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Clinton Begin
+ * 相当于是获取某个对象的某个字段的值
  */
 public class GetFieldInvoker implements Invoker {
   private Field field;
@@ -30,6 +31,7 @@ public class GetFieldInvoker implements Invoker {
 
   @Override
   public Object invoke(Object target, Object[] args) throws IllegalAccessException, InvocationTargetException {
+    // 相当于是获取某个对象的某个字段的值 某个对象是指 target ，某个字段是指 field ，获取到的值是 field.get(target) 调用的结果。
     return field.get(target);
   }
 

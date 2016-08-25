@@ -20,6 +20,7 @@ import org.apache.ibatis.reflection.ReflectionException;
 
 /**
  * @author Clinton Begin
+ * todo 这个类的作用是什么？
  */
 public class DefaultObjectWrapperFactory implements ObjectWrapperFactory {
 

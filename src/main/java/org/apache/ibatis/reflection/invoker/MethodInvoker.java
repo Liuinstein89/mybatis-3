@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
  * @author Clinton Begin
  */
 public class MethodInvoker implements Invoker {
-
+  // 如果参数的长度为 1 的话 type 就是这个参数的类型，如果没有参数或多个参数 type 为方法的返回类型
   private Class<?> type;
   private Method method;
 

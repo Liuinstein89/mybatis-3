@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Clinton Begin
+ * 相当于给某一个对象的某一个 field 赋值
  */
 public class SetFieldInvoker implements Invoker {
   private Field field;
@@ -30,6 +31,7 @@ public class SetFieldInvoker implements Invoker {
 
   @Override
   public Object invoke(Object target, Object[] args) throws IllegalAccessException, InvocationTargetException {
+    // 相当于给某一个对象的某一个字段赋值 某一个对象指 target 某一个字段指 field ，赋值的内容是 args[0]
     field.set(target, args[0]);
     return null;
   }
