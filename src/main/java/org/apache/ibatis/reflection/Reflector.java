@@ -27,6 +27,7 @@ import java.util.*;
 /*
  * This class represents a cached set of class definition information that
  * allows for easy mapping between property names and getter/setter methods.
+ * Reflector 代表了一个 class 的定义信息的缓存集合。属性名称和 getter/setter 通过 Reflector 很容易就得到了映射。
  */
 /**
  * @author Clinton Begin
@@ -41,6 +42,7 @@ public class Reflector {
   private Map<String, Invoker> setMethods = new HashMap<String, Invoker>();
   private Map<String, Invoker> getMethods = new HashMap<String, Invoker>();
   private Map<String, Class<?>> setTypes = new HashMap<String, Class<?>>();
+  // get 方法的返回值的集合
   private Map<String, Class<?>> getTypes = new HashMap<String, Class<?>>();
   private Constructor<?> defaultConstructor;
 
@@ -164,6 +166,12 @@ public class Reflector {
     resolveSetterConflicts(conflictingSetters);
   }
 
+  /**
+   * 把同名的方法都放在了一个 List 中
+   * @param conflictingMethods
+   * @param name
+   * @param method
+   */
   private void addMethodConflict(Map<String, List<Method>> conflictingMethods, String name, Method method) {
     List<Method> list = conflictingMethods.get(name);
     if (list == null) {
@@ -294,6 +302,13 @@ public class Reflector {
     return methods.toArray(new Method[methods.size()]);
   }
 
+  // todo
+  // http://stackoverflow.com/questions/6745472/writing-synthetic-bridge-method-in-java
+  //http://stas-blogspot.blogspot.jp/2010/03/java-bridge-methods-explained.html
+  //https://javax0.wordpress.com/2014/02/26/syntethic-and-bridge-methods/
+  //https://docs.oracle.com/javase/tutorial/java/generics/bridgeMethods.html
+  //http://stackoverflow.com/users/1237575/rafael-winterhalter
+
   private void addUniqueMethods(Map<String, Method> uniqueMethods, Method[] methods) {
     for (Method currentMethod : methods) {
       if (!currentMethod.isBridge()) {
@@ -316,6 +331,11 @@ public class Reflector {
     }
   }
 
+  /**
+   * 获取方法的签名 [返回类型#]方法名称：参数名1，参数名2
+   * @param method
+   * @return
+   */
   private String getSignature(Method method) {
     StringBuilder sb = new StringBuilder();
     Class<?> returnType = method.getReturnType();
