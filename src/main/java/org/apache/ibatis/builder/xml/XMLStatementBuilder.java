@@ -26,8 +26,7 @@ import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
 
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * @author Clinton Begin

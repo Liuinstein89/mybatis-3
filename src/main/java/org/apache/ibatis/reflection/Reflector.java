@@ -39,10 +39,17 @@ public class Reflector {
   private Class<?> type;
   private String[] readablePropertyNames = EMPTY_STRING_ARRAY;
   private String[] writeablePropertyNames = EMPTY_STRING_ARRAY;
+
+  // setMethods getMethods setTypes getTypes 会优先添加 method 和 method 的类型
+  // 例如有个属性叫 myObject 如果已经有了 getMyObject() 方法的话，getMethods 里会添加 method ，就不会再添加 GetFieldInvoker 了。
+  // 如果有个属性叫 myObject 如果没有相应的 get/set 方法才会添加 GetFieldInvoker/SetFieldInvoker 以及类型。
+  // set 方法和 可写属性 SetFieldInvoker 的集合
   private Map<String, Invoker> setMethods = new HashMap<String, Invoker>();
+  // get 方法和 可读属性 Invoker 的集合
   private Map<String, Invoker> getMethods = new HashMap<String, Invoker>();
+  // set 方法和 可写属性 Invoker 的集合
   private Map<String, Class<?>> setTypes = new HashMap<String, Class<?>>();
-  // get 方法的返回值的集合
+  // get 方法的返回值和可读属性的类型的集合
   private Map<String, Class<?>> getTypes = new HashMap<String, Class<?>>();
   private Constructor<?> defaultConstructor;
 
@@ -51,6 +58,7 @@ public class Reflector {
   public Reflector(Class<?> clazz) {
     type = clazz;
     addDefaultConstructor(clazz);
+    // 先处理 get 后处理 set 这两者的顺序应该是不能调换的，因为下面的 resolveSetterConflicts() 方法中用到了 getTypes.get(propName);
     addGetMethods(clazz);
     addSetMethods(clazz);
     addFields(clazz);
@@ -97,6 +105,7 @@ public class Reflector {
       if (name.startsWith("get") && name.length() > 3) {
         if (method.getParameterTypes().length == 0) {
           name = PropertyNamer.methodToProperty(name);
+          // todo 什么时候会有冲突的方法出现？ 方法的名称相同，但却没有参数，只能有这样的一个方法，不可能出现多个方法
           addMethodConflict(conflictingGetters, name, method);
         }
       } else if (name.startsWith("is") && name.length() > 2) {
@@ -109,6 +118,10 @@ public class Reflector {
     resolveGetterConflicts(conflictingGetters);
   }
 
+  /**
+   * 解决有冲突的 getter 方法 todo 但什么时候方法会有冲突呢？？？ get 方法应该不会有冲突啊 get 方法的名称一样，而且没有参数这样的方法只能是唯一的
+   * @param conflictingGetters
+     */
   private void resolveGetterConflicts(Map<String, List<Method>> conflictingGetters) {
     for (String propName : conflictingGetters.keySet()) {
       List<Method> getters = conflictingGetters.get(propName);
@@ -122,7 +135,11 @@ public class Reflector {
         while (iterator.hasNext()) {
           Method method = iterator.next();
           Class<?> methodType = method.getReturnType();
-          // 为什么会抛异常呢
+          // todo 为什么会抛异常呢 不应该出现这种情况啊 get 方法的方法名完全相同 get 方法没有参数而且返回类型还完全相同，
+          // 不可能 在 conflictingGetters 中添加了两次啊
+          // 有可能是其父类，接口的方法。应该是指z子类重写了父类的实现。调用的时候不知道应该调用子类的实现还是父类的实现。
+          // 但这种情况下不管调用哪个 Method 最终结果是一样的，会多态调用相应的方法。
+          // todo 在虚拟机层面也不可能出现两个签名完全一样的方法，包括方法名，参数（没有参数），返回类型
           if (methodType.equals(getterType)) {
             // todo overload or override?
             throw new ReflectionException("Illegal overloaded getter method with ambiguous type for property "
@@ -134,6 +151,7 @@ public class Reflector {
             getter = method;
             getterType = methodType;
           } else {
+            // todo 到底是 overload 还是 override ？
             throw new ReflectionException("Illegal overloaded getter method with ambiguous type for property "
                 + propName + " in class " + firstMethod.getDeclaringClass()
                 + ".  This breaks the JavaBeans " + "specification and can cause unpredicatble results.");
@@ -153,6 +171,7 @@ public class Reflector {
 
   private void addSetMethods(Class<?> cls) {
     Map<String, List<Method>> conflictingSetters = new HashMap<String, List<Method>>();
+    // 获取当前类或当前类的直接接口的所有方法
     Method[] methods = getClassMethods(cls);
     for (Method method : methods) {
       String name = method.getName();
@@ -167,7 +186,7 @@ public class Reflector {
   }
 
   /**
-   * 把同名的方法都放在了一个 List 中
+   * 把同名的方法都放在了一个 List 中 todo 感觉不应该发生冲突啊 方法的名称相同
    * @param conflictingMethods
    * @param name
    * @param method
@@ -181,6 +200,10 @@ public class Reflector {
     list.add(method);
   }
 
+  /**
+   * todo 添加的顺序
+   * @param conflictingSetters
+     */
   private void resolveSetterConflicts(Map<String, List<Method>> conflictingSetters) {
     for (String propName : conflictingSetters.keySet()) {
       List<Method> setters = conflictingSetters.get(propName);
@@ -188,6 +211,7 @@ public class Reflector {
       if (setters.size() == 1) {
         addSetMethod(propName, firstMethod);
       } else {
+        // todo 有多个同名的方法，但却没有一个 get 方法？？？
         Class<?> expectedType = getTypes.get(propName);
         if (expectedType == null) {
           throw new ReflectionException("Illegal overloaded setter method with ambiguous type for property "
@@ -198,6 +222,7 @@ public class Reflector {
           Method setter = null;
           while (methods.hasNext()) {
             Method method = methods.next();
+            // set 方法的参数类型应该与相应的 get 方法的返回类型是一致的
             if (method.getParameterTypes().length == 1
                 && expectedType.equals(method.getParameterTypes()[0])) {
               setter = method;
@@ -222,6 +247,10 @@ public class Reflector {
     }
   }
 
+  /**
+   * 递归方法 设置一个 类 及其父类 的 setMethod 和 getMethod
+   * @param clazz
+     */
   private void addFields(Class<?> clazz) {
     Field[] fields = clazz.getDeclaredFields();
     for (Field field : fields) {
@@ -237,6 +266,7 @@ public class Reflector {
           // issue #379 - removed the check for final because JDK 1.5 allows
           // modification of final fields through reflection (JSR-133). (JGB)
           // pr #16 - final static can only be set by the classloader
+          // jdk1.5 之后允许反射设置 final 字段的值 但 final static 字段的值只允许 classloader 设置
           int modifiers = field.getModifiers();
           if (!(Modifier.isFinal(modifiers) && Modifier.isStatic(modifiers))) {
             addSetField(field);
@@ -252,6 +282,10 @@ public class Reflector {
     }
   }
 
+  /**
+   * 如果允许访问私有字段的话除了 final static 字段的值不能更改其他字段的值都是可以更改的。
+   * @param field
+     */
   private void addSetField(Field field) {
     if (isValidPropertyName(field.getName())) {
       setMethods.put(field.getName(), new SetFieldInvoker(field));
@@ -259,6 +293,10 @@ public class Reflector {
     }
   }
 
+  /**
+   * 如果允许访问私有字段的话所有的字段都是可读的
+   * @param field
+     */
   private void addGetField(Field field) {
     if (isValidPropertyName(field.getName())) {
       getMethods.put(field.getName(), new GetFieldInvoker(field));
@@ -280,6 +318,7 @@ public class Reflector {
    * @return An array containing all methods in this class
    * 获取该类以及该类的所有父类及其父接口的所有方法 但只获取到该类的直接父接口的方法和该父类的直接父接口的方法
    */
+
   private Method[] getClassMethods(Class<?> cls) {
     Map<String, Method> uniqueMethods = new HashMap<String, Method>();
     Class<?> currentClass = cls;
@@ -396,6 +435,11 @@ public class Reflector {
     return method;
   }
 
+  /**
+   * 根据 属性名称 返回 get Invoker
+   * @param propertyName
+   * @return
+     */
   public Invoker getGetInvoker(String propertyName) {
     Invoker method = getMethods.get(propertyName);
     if (method == null) {
@@ -409,6 +453,7 @@ public class Reflector {
    *
    * @param propertyName - the name of the property
    * @return The Class of the propery setter
+   * 返回名叫 properName 的 get 属性的类型
    */
   public Class<?> getSetterType(String propertyName) {
     Class<?> clazz = setTypes.get(propertyName);
@@ -423,6 +468,7 @@ public class Reflector {
    *
    * @param propertyName - the name of the property
    * @return The Class of the propery getter
+   * 返回 get 方法的返回类型（get 属性名叫 propertyName 的字段的类型）
    */
   public Class<?> getGetterType(String propertyName) {
     Class<?> clazz = getTypes.get(propertyName);

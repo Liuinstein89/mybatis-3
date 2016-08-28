@@ -28,6 +28,7 @@ import org.apache.ibatis.reflection.property.PropertyTokenizer;
 
 /**
  * @author Clinton Begin
+ * MetaClass 是对 Reflector 的进一步封装
  */
 public class MetaClass {
 
@@ -43,11 +44,22 @@ public class MetaClass {
     return new MetaClass(type, reflectorFactory);
   }
 
+  /**
+   * 构建出属性名称为 name 的属性的 MetaClass 。
+   * @param name
+   * @return
+     */
   public MetaClass metaClassForProperty(String name) {
+    // reflector.getGetterType() 方法要比 setterType 包含的类型更全
     Class<?> propType = reflector.getGetterType(name);
     return MetaClass.forClass(propType, reflectorFactory);
   }
 
+  /**
+   * todo 是由 name.name 拼起来来的具体的还是不太明白
+   * @param name
+   * @return
+     */
   public String findProperty(String name) {
     StringBuilder prop = buildProperty(name, new StringBuilder());
     return prop.length() > 0 ? prop.toString() : null;
@@ -72,6 +84,7 @@ public class MetaClass {
     PropertyTokenizer prop = new PropertyTokenizer(name);
     if (prop.hasNext()) {
       MetaClass metaProp = metaClassForProperty(prop.getName());
+      // 递归调用 可能是 A 里有 B B 里有 C 通过 a.b.c 来获取 c 的类型
       return metaProp.getSetterType(prop.getChildren());
     } else {
       return reflector.getSetterType(prop.getName());
@@ -93,6 +106,11 @@ public class MetaClass {
     return MetaClass.forClass(propType, reflectorFactory);
   }
 
+  /**
+   * todo 比较复杂 暂时有些不明白 为什么 getGetterType 和 getSetterType 有很大的不同，感觉二者应该很相似
+   * @param prop
+   * @return
+     */
   private Class<?> getGetterType(PropertyTokenizer prop) {
     Class<?> type = reflector.getGetterType(prop.getName());
     if (prop.getIndex() != null && Collection.class.isAssignableFrom(type)) {
@@ -112,6 +130,11 @@ public class MetaClass {
     return type;
   }
 
+  /**
+   * 获取 属性的泛型类型
+   * @param propertyName
+   * @return
+     */
   private Type getGenericGetterType(String propertyName) {
     try {
       Invoker invoker = reflector.getGetInvoker(propertyName);
@@ -132,6 +155,11 @@ public class MetaClass {
     return null;
   }
 
+  /**
+   * 递归调用判断时候含有某个 setter
+   * @param name
+   * @return
+     */
   public boolean hasSetter(String name) {
     PropertyTokenizer prop = new PropertyTokenizer(name);
     if (prop.hasNext()) {
