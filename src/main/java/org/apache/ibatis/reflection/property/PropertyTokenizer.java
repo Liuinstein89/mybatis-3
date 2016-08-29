@@ -23,6 +23,7 @@ import java.util.Iterator;
 public class PropertyTokenizer implements Iterable<PropertyTokenizer>, Iterator<PropertyTokenizer> {
   private String name;
   private String indexedName;
+  // todo 这个索引有时候会是数值型，但是不是只能是数值型就不知道了
   private String index;
   private String children;
 

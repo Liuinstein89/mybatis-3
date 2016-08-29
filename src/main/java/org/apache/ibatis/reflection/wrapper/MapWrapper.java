@@ -15,14 +15,14 @@
  */
 package org.apache.ibatis.reflection.wrapper;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.property.PropertyTokenizer;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Clinton Begin
@@ -109,6 +109,11 @@ public class MapWrapper extends BaseWrapper {
     }
   }
 
+  /**
+   * hasSetter 的目的是能不能设置某个对象的属性名称为 name 的属性，而 map 肯定可以设置值，所以直接返回 true
+   * @param name
+   * @return
+   */
   @Override
   public boolean hasSetter(String name) {
     return true;
