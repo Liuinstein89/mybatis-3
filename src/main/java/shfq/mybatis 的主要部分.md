@@ -1,0 +1,5 @@
+- 一级缓存和二级缓存
+- 数据源连接池等
+- 事物
+- mapper 动态代理
+- 懒加载 http://mydailyjava.blogspot.jp/2013/11/cglib-missing-manual.html http://jboss-javassist.github.io/javassist/tutorial/tutorial.html
