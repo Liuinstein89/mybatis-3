@@ -38,7 +38,7 @@ import org.apache.ibatis.transaction.Transaction;
  * @author Jeff Butler 
  */
 public class BatchExecutor extends BaseExecutor {
-
+  // todo 为什么要最小值 + 1002
   public static final int BATCH_UPDATE_RETURN_VALUE = Integer.MIN_VALUE + 1002;
 
   private final List<Statement> statementList = new ArrayList<Statement>();
@@ -50,6 +50,13 @@ public class BatchExecutor extends BaseExecutor {
     super(configuration, transaction);
   }
 
+  /**
+   * todo 不知道是怎么批量更新的
+   * @param ms
+   * @param parameterObject
+   * @return
+   * @throws SQLException
+     */
   @Override
   public int doUpdate(MappedStatement ms, Object parameterObject) throws SQLException {
     final Configuration configuration = ms.getConfiguration();
@@ -60,7 +67,7 @@ public class BatchExecutor extends BaseExecutor {
     if (sql.equals(currentSql) && ms.equals(currentStatement)) {
       int last = statementList.size() - 1;
       stmt = statementList.get(last);
-     handler.parameterize(stmt);//fix Issues 322
+      handler.parameterize(stmt);//fix Issues 322
       BatchResult batchResult = batchResultList.get(last);
       batchResult.addParameterObject(parameterObject);
     } else {

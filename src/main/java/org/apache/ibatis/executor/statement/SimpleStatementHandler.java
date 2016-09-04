@@ -39,6 +39,12 @@ public class SimpleStatementHandler extends BaseStatementHandler {
     super(executor, mappedStatement, parameter, rowBounds, resultHandler, boundSql);
   }
 
+  /**
+   * 增、删、改
+   * @param statement
+   * @return
+   * @throws SQLException
+     */
   @Override
   public int update(Statement statement) throws SQLException {
     String sql = boundSql.getSql();

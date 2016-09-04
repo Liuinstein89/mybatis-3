@@ -30,6 +30,7 @@ import org.apache.ibatis.session.RowBounds;
 
 /**
  * @author Clinton Begin
+ * 路由 statementHandler 有点像代理一样 根据传入的 statementType 会创建相应的 handler ，最终是由具体的 handler 去执行。
  */
 public class RoutingStatementHandler implements StatementHandler {
 

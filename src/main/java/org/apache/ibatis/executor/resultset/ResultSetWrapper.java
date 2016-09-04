@@ -39,8 +39,15 @@ class ResultSetWrapper {
   private final List<String> classNames = new ArrayList<String>();
   // 列的 jdbc 类型
   private final List<JdbcType> jdbcTypes = new ArrayList<JdbcType>();
+  // todo 为什么要设计成这样？ 键是一个列的名称，值是 map
   private final Map<String, Map<Class<?>, TypeHandler<?>>> typeHandlerMap = new HashMap<String, Map<Class<?>, TypeHandler<?>>>();
+
+  // 假设 Map<String, List<String>> 中的 值一个 list 是 mappedColumnNames，则 mappedColumnNames + unMappedColumnNames = columnNames
+  //  其中 mappedColumnNames 是根据 resultMap 中的 mappedColumns 来决定的 mappedColumnNames 的每一个值一定是某一个 resultMap 所映射的列名，但
+  // unMappedColumnNames 却不一定是，它里面可能包含了其他 resultMap 映射的所有的列。
+  // mappedColumnNames
   // 为什么要设计成这样的结构呢，即 Map 里的值是 List 因为一个结果集里可能需要映射多个 ResultMap 一个 ResultMap 需要对应一个 List
+  // 键是 resultMap + : + columnPrefix 组成
   private Map<String, List<String>> mappedColumnNamesMap = new HashMap<String, List<String>>();
   // 为什么要设计成这样的结构呢，即 Map 里的值是 List 因为一个结果集里可能需要映射多个 ResultMap 一个 ResultMap 需要对应一个 List
 
@@ -75,7 +82,9 @@ class ResultSetWrapper {
    * Gets the type handler to use when reading the result set.
    * Tries to get from the TypeHandlerRegistry by searching for the property type.
    * If not found it gets the column JDBC type and tries to get a handler for it.
-   * 
+   * 读取结果集中的值时会获取 handler
+   * 先会根据属性名称试着从 TypeHandlerRegistry 中查找相应的 typeHandler
+   *
    * @param propertyType
    * @param columnName
    * @return
@@ -160,6 +169,12 @@ class ResultSetWrapper {
     return resultMap.getId() + ":" + columnPrefix;
   }
 
+  /**
+   * 迭代 columnNames 并添加带有前缀的列名
+   * @param columnNames
+   * @param prefix
+   * @return
+     */
   private Set<String> prependPrefixes(Set<String> columnNames, String prefix) {
     if (columnNames == null || columnNames.isEmpty() || prefix == null || prefix.length() == 0) {
       return columnNames;

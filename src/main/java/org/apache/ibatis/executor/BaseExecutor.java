@@ -48,8 +48,11 @@ public abstract class BaseExecutor implements Executor {
   protected Transaction transaction;
   protected Executor wrapper;
 
+  // 延迟加载
   protected ConcurrentLinkedQueue<DeferredLoad> deferredLoads;
+  // 本地永久缓存
   protected PerpetualCache localCache;
+  // 本地输出参数永久缓存
   protected PerpetualCache localOutputParameterCache;
   protected Configuration configuration;
 
@@ -253,6 +256,9 @@ public abstract class BaseExecutor implements Executor {
     }
   }
 
+  /**
+   * 回滚之前会清空本地缓存 更新之前会清空缓存 提交事务之前会清空缓存 查询的时候也会清空缓存
+   */
   @Override
   public void clearLocalCache() {
     if (!closed) {
@@ -280,6 +286,13 @@ public abstract class BaseExecutor implements Executor {
     }
   }
 
+  /**
+   * 存储过程才会有 outputParameters
+   * @param ms
+   * @param key
+   * @param parameter
+   * @param boundSql
+     */
   private void handleLocallyCachedOutputParameters(MappedStatement ms, CacheKey key, Object parameter, BoundSql boundSql) {
     if (ms.getStatementType() == StatementType.CALLABLE) {
       final Object cachedParameter = localOutputParameterCache.getObject(key);
@@ -327,7 +340,10 @@ public abstract class BaseExecutor implements Executor {
   public void setExecutorWrapper(Executor wrapper) {
     this.wrapper = wrapper;
   }
-  
+
+  /**
+   * 延迟加载
+   */
   private static class DeferredLoad {
 
     // MetaObject 封装了某一个对象，这个对象的一个属性需要延迟加载
