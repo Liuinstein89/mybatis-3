@@ -7,17 +7,21 @@
         <id column="clerk_house_no" property="houseNo"></id>
         <result column="street_name" property="streetName"></result>
     </resultMap>
-    <!--<resultMap id="clerkResultMap" type="shfq.composite_column.Clerk">-->
-        <!--<id column="id" property="id"></id>-->
-        <!--<result column="name" property="name"></result>-->
-        <!--<association property="clerkAddress" column="{streetNo=address_street_no,houseNo=address_house_no}" resultMap="clerkAddressResultMap" />-->
-    <!--</resultMap>-->
-
     <resultMap id="clerkResultMap" type="shfq.composite_column.Clerk">
         <id column="id" property="id"></id>
         <result column="name" property="name"></result>
-        <association property="clerkAddress" resultMap="clerkAddressResultMap" />
+        <association property="clerkAddress" column="{streetNo=address_street_no,houseNo=address_house_no}" resultMap="compositeColumnsSelect" />
     </resultMap>
+    <select id="compositeColumnsSelect" resultMap="clerkAddressResultMap">
+        SELECT street_no as clerk_street_no, house_no AS clerk_house_no, street_name FROM clert_address where street_no=#{streetNo} and house_no=#{houseNo}
+    </select>
+
+    组合列查询有问题。。。。
+    <!--<resultMap id="clerkResultMap" type="shfq.composite_column.Clerk">-->
+        <!--<id column="id" property="id"></id>-->
+        <!--<result column="name" property="name"></result>-->
+        <!--<association property="clerkAddress" resultMap="clerkAddressResultMap" />-->
+    <!--</resultMap>-->
 
     <select id="selectClerk" parameterType="int" resultMap="clerkResultMap">
         SELECT clerk.id, clerk.name, clerk.street_no as clerk_street_no, clerk.house_no as clerk_house_no, address.street_no as address_street_no, address.house_no as address_house_no, address.street_name from clerk clerk, clerk_address address WHERE clerk.id=#{id} and clerk.street_no=address.street_no and clerk.house_no=address.house_no

@@ -21,7 +21,7 @@ public class ClerkTest {
     }
     private static void queryClerk() {
         try {
-            Reader reader = Resources.getResourceAsReader("shfq/mybatis-config.xml");
+            Reader reader = Resources.getResourceAsReader("shfq/composite_column/scripts/mybatis-config.xml");
             SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
             SqlSession session = sqlSessionFactory.openSession();
             Object clerk = session.selectList("shfq.composite_column.Clerk.selectClerk", 1);
