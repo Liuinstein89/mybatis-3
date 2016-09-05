@@ -522,6 +522,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     final Class<?> resultType = resultMap.getType();
     final MetaClass metaType = MetaClass.forClass(resultType, reflectorFactory);
     final List<ResultMapping> constructorMappings = resultMap.getConstructorResultMappings();
+    // 原生类型的 type 都会保存在 typeHandlerRegistry 比如 String boolean float double 等
     if (typeHandlerRegistry.hasTypeHandler(resultType)) {
       return createPrimitiveResultObject(rsw, resultMap, columnPrefix);
     } else if (!constructorMappings.isEmpty()) {
@@ -534,6 +535,16 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     throw new ExecutorException("Do not know how to create an instance of " + resultType);
   }
 
+  /**
+   * 利用非默认构造方法创建 result 对象
+   * @param rsw
+   * @param resultType
+   * @param constructorMappings
+   * @param constructorArgTypes
+   * @param constructorArgs
+   * @param columnPrefix
+   * @return
+   */
   Object createParameterizedResultObject(ResultSetWrapper rsw, Class<?> resultType, List<ResultMapping> constructorMappings,
       List<Class<?>> constructorArgTypes, List<Object> constructorArgs, String columnPrefix) {
     boolean foundValues = false;
@@ -594,11 +605,23 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     return names;
   }
 
+  /**
+   * 创建原生类型的 result 对象
+   * 比如 select id from student
+   * id 是 Integer 类型的
+   * @param rsw
+   * @param resultMap
+   * @param columnPrefix
+   * @return
+   * @throws SQLException
+   */
   private Object createPrimitiveResultObject(ResultSetWrapper rsw, ResultMap resultMap, String columnPrefix) throws SQLException {
     final Class<?> resultType = resultMap.getType();
     final String columnName;
     if (!resultMap.getResultMappings().isEmpty()) {
       final List<ResultMapping> resultMappingList = resultMap.getResultMappings();
+      // todo 为什么只取 resultMappingList.get(0);
+      // 因为返回的对象是原生类型，只返回了数据库中的一列，正常情况下映射列表 resultMappingList 的长度应该是 1
       final ResultMapping mapping = resultMappingList.get(0);
       columnName = prependPrefix(mapping.getColumn(), columnPrefix);
     } else {
@@ -612,6 +635,18 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   // NESTED QUERY
   //
 
+  /**
+   * 嵌套查询出某一条记录，然后把该条记录的值作为构造方法的参数
+   *  <constructor>
+   *      <arg select=""></arg>
+   *  </constructor>
+   *  构造方法的某一个参数可能是一个 嵌套查询
+   * @param rs
+   * @param constructorMapping
+   * @param columnPrefix
+   * @return
+   * @throws SQLException
+   */
   private Object getNestedQueryConstructorValue(ResultSet rs, ResultMapping constructorMapping, String columnPrefix) throws SQLException {
     final String nestedQueryId = constructorMapping.getNestedQueryId();
     final MappedStatement nestedQuery = configuration.getMappedStatement(nestedQueryId);
@@ -711,21 +746,34 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     // resultMap 中含有 discriminator discriminator 又确定了一个 discriminator
     while (discriminator != null) {
       final Object value = getDiscriminatorValue(rs, discriminator, columnPrefix);
+      // 鉴别器 中的 column 的值又是 Map 中的 key ，根据 key 取出相应的值，根据值可以确定返回的类型
       final String discriminatedMapId = discriminator.getMapIdFor(String.valueOf(value));
+      // discriminatedMapId 可以是一个 class 的全名，也可以是一个 <resultMap> 的 id
+      // discriminatedMapId 是 <resultMap> 的 id 的情况
       if (configuration.hasResultMap(discriminatedMapId)) {
         resultMap = configuration.getResultMap(discriminatedMapId);
         Discriminator lastDiscriminator = discriminator;
         discriminator = resultMap.getDiscriminator();
+        // !pastDiscriminators.add(discriminatedMapId) 防止死循环 如果某个 discriminatedMapId 已经出现过了，则 break
         if (discriminator == lastDiscriminator || !pastDiscriminators.add(discriminatedMapId)) {
           break;
         }
       } else {
+        // discriminatedMapId 是一个 class 的全名
         break;
       }
     }
     return resultMap;
   }
 
+  /**
+   * 根据 <discriminator javaType="String" column="type"> 标签中的 column 值获取到相应的值
+   * @param rs
+   * @param discriminator
+   * @param columnPrefix
+   * @return
+   * @throws SQLException
+   */
   private Object getDiscriminatorValue(ResultSet rs, Discriminator discriminator, String columnPrefix) throws SQLException {
     final ResultMapping resultMapping = discriminator.getResultMapping();
     final TypeHandler<?> typeHandler = resultMapping.getTypeHandler();

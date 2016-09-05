@@ -40,6 +40,7 @@ class ResultSetWrapper {
   // 列的 jdbc 类型
   private final List<JdbcType> jdbcTypes = new ArrayList<JdbcType>();
   // todo 为什么要设计成这样？ 键是一个列的名称，值是 map
+  // 难道是因为 discriminator 的缘故，同一个列，值不同，返回的类型也不同
   private final Map<String, Map<Class<?>, TypeHandler<?>>> typeHandlerMap = new HashMap<String, Map<Class<?>, TypeHandler<?>>>();
 
   // 假设 Map<String, List<String>> 中的 值一个 list 是 mappedColumnNames，则 mappedColumnNames + unMappedColumnNames = columnNames
@@ -84,6 +85,7 @@ class ResultSetWrapper {
    * If not found it gets the column JDBC type and tries to get a handler for it.
    * 读取结果集中的值时会获取 handler
    * 先会根据属性名称试着从 TypeHandlerRegistry 中查找相应的 typeHandler
+   * // todo ????
    *
    * @param propertyType
    * @param columnName

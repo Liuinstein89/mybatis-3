@@ -41,7 +41,7 @@ public class ResultMapping {
   private TypeHandler<?> typeHandler;
   // 嵌套结果集 id ，一般是在 association 或 collection 对应的结果集的 id
   private String nestedResultMapId;
-  // 嵌套查询 id ，一般是在 association 或 collection 对应的 select 的 id
+  // 嵌套查询 id ，一般是在 association 或 collection 或 <constructor><arg select=""></arg></constructor> 对应的 select 的 id
   private String nestedQueryId;
   private Set<String> notNullColumns;
   private String columnPrefix;

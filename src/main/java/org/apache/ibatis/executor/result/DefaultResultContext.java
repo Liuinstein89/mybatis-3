@@ -19,6 +19,7 @@ import org.apache.ibatis.session.ResultContext;
 
 /**
  * @author Clinton Begin
+ * Result 的上下文，用于记录当前一共映射了多少个对象以及被映射的当前对象是什么，映射有没有结束
  */
 public class DefaultResultContext<T> implements ResultContext<T> {
 

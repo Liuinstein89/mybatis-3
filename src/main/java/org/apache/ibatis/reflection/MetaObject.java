@@ -106,6 +106,11 @@ public class MetaObject {
     return objectWrapper.hasGetter(name);
   }
 
+  /**
+   * 根据属性名称获取相应的值，属性名称可能是简单的名称，也可能是复杂的，例如 a.b.c 表示的是 对象 o 里有一个属性 a，属性 a 里有一个属性 b ，属性 b 里又有一个属性 c 。
+   * @param name
+   * @return
+   */
   public Object getValue(String name) {
     PropertyTokenizer prop = new PropertyTokenizer(name);
     if (prop.hasNext()) {

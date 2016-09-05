@@ -27,6 +27,11 @@ import java.util.Map;
 public class Discriminator {
 
   private ResultMapping resultMapping;
+  // <discriminator javaType="String" column="type">
+  // <case value="car" resultType="shfq.discriminator.vo.Car"/>
+  // <case value="bus" resultType="shfq.discriminator.vo.Bus"/>
+  // </discriminator>
+  // 把 <discriminator/> 中的每一个 <case/> 作为 Map 中的一项添加进去 <case/> 中的 value 作为 Map 的 key，<case/> 中的 resultType 作为 Map 的 value 。
   private Map<String, String> discriminatorMap;
 
   Discriminator() {

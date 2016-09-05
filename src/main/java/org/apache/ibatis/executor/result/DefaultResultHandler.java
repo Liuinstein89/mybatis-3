@@ -15,15 +15,16 @@
  */
 package org.apache.ibatis.executor.result;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.session.ResultContext;
 import org.apache.ibatis.session.ResultHandler;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Clinton Begin
+ * ResultHandler 是对结果集映射后的对象进行管理包括，每映射完一个对象后就会把该对象交给 ResultHandler 进行管理。
  */
 public class DefaultResultHandler implements ResultHandler<Object> {
 
