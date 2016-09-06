@@ -40,6 +40,6 @@
         </environment>
     </environments>
     <mappers>
-        <mapper resource="shfq/composite_column/mappers/ClerkMapper.xml"></mapper>
+        <mapper resource="shfq/composite_column/mappers/CompositeClerkMapper.xml"></mapper>
     </mappers>
 </configuration>

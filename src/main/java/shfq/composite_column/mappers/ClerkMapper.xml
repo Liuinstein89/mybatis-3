@@ -16,7 +16,6 @@
         SELECT street_no as clerk_street_no, house_no AS clerk_house_no, street_name FROM clert_address where street_no=#{streetNo} and house_no=#{houseNo}
     </select>
 
-    组合列查询有问题。。。。
     <!--<resultMap id="clerkResultMap" type="shfq.composite_column.Clerk">-->
         <!--<id column="id" property="id"></id>-->
         <!--<result column="name" property="name"></result>-->

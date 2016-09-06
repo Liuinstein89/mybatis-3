@@ -713,7 +713,8 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   }
 
   /**
-   * 如果
+   * 如果 parameterType 为 null 的话，实例化出来的参数 parameterObject 为 HashMap，在 组合列的情况下 如果 parameterObject 为 HashMap
+   * 的话会把组合列以键值对儿的形式保存
    * @param rs
    * @param resultMapping
    * @param parameterType
