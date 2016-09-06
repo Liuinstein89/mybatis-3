@@ -47,8 +47,12 @@ public class ResultMapping {
   private String columnPrefix;
   // 在 Mapper 的 @Arg 中如果是主键的话 List<ResultFlag> 中有两种值 ID 和 CONSTRUCTOR，如果是非主键的话则只有 CONSTRUCTOR
   private List<ResultFlag> flags;
-  // 只有<association> 和 <collection> 中才可能会用到 组合列 column ，并且 组合列 column 总是和 select 属性一起出现的，它出现的目的就是为 select 语句中传参数
+  // 只有<association> 和 <collection> <onstruct><arg column></arg></construct> 中才可能会用到 组合列 column ，并且 组合列 column 总是和 select 属性一起出现的，它出现的目的就是为 select 语句中传参数
+  // 不知道还有没在其他情况下也出现 column 的情况，但 column 一定是和 select 一起出现的，一般是在构造一个对象的过程中，会引用到另外一个对象，这个被引用的对象需要再次从数据库中查询出来，
+  // 所以 column 和 select 一般是成对儿出现的
   // 可以参考：http://mybatis-user.963551.n3.nabble.com/resultsMap-association-as-component-of-compound-key-td4013936.html
+  // 组合列 column 和 select 是成对儿出现的，当他们出现的时候 <select id="selectClerkAddress" resultMap="clerkAddressResultMap"> 标签中是不需要参数的，
+  // 因为参数实际上是由 column 传递过来的。
   private List<ResultMapping> composites;
   private String resultSet;
   private String foreignColumn;

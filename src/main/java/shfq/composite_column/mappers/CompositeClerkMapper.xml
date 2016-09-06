@@ -1,0 +1,25 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--使用组合列查询的例子-->
+<mapper namespace = "shfq.composite_column.composite.Clerk">
+    <resultMap id="clerkAddressResultMap" type="shfq.composite_column.ClerkAddress">
+        <id column="street_no" property="streetNo"></id>
+        <id column="house_no" property="houseNo"></id>
+        <result column="street_name" property="streetName"></result>
+    </resultMap>
+
+    <resultMap id="clerkResultMap" type="shfq.composite_column.Clerk">
+        <id column="id" property="id"></id>
+        <result column="name" property="name"></result>
+        <association property="clerkAddress" column="{streetNo=street_no,houseNo=house_no}" select="selectClerkAddress" />
+    </resultMap>
+    <select id="selectClerkAddress" resultMap="clerkAddressResultMap">
+        SELECT * from clerk_address where street_no=#{streetNo} and house_no=#{houseNo}
+    </select>
+
+    <!--使用组合列查询的例子-->
+    <select id="selectClerk" parameterType="int" resultMap="clerkResultMap">
+        SELECT id, name, street_no, house_no from clerk  WHERE clerk.id=#{id}
+    </select>
+</mapper>
