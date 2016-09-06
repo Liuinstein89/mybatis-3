@@ -225,6 +225,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   // todo 处理返回的一个结果集
   private void handleResultSet(ResultSetWrapper rsw, ResultMap resultMap, List<Object> multipleResults, ResultMapping parentMapping) throws SQLException {
     try {
+      // todo 什么时候会有 parentMapping ????
       if (parentMapping != null) {
         handleRowValues(rsw, resultMap, null, RowBounds.DEFAULT, parentMapping);
       } else {
@@ -517,6 +518,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     return resultObject;
   }
 
+  // 创建需要返回的对象
   private Object createResultObject(ResultSetWrapper rsw, ResultMap resultMap, List<Class<?>> constructorArgTypes, List<Object> constructorArgs, String columnPrefix)
       throws SQLException {
     final Class<?> resultType = resultMap.getType();
@@ -710,6 +712,15 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     return typeHandler.getResult(rs, prependPrefix(resultMapping.getColumn(), columnPrefix));
   }
 
+  /**
+   * 如果
+   * @param rs
+   * @param resultMapping
+   * @param parameterType
+   * @param columnPrefix
+   * @return
+   * @throws SQLException
+   */
   private Object prepareCompositeKeyParameter(ResultSet rs, ResultMapping resultMapping, Class<?> parameterType, String columnPrefix) throws SQLException {
     final Object parameterObject = instantiateParameterObject(parameterType);
     final MetaObject metaObject = configuration.newMetaObject(parameterObject);
