@@ -174,6 +174,15 @@ public abstract class BaseExecutor implements Executor {
     return list;
   }
 
+  /**
+   * 延迟加载 和 懒加载还有些不一样，延迟加载时再 Executor 还没关闭前去加载，但懒加载是在用户真正需要使用对象的时候去加载，这时候 executor 早已经关闭了
+   * 延迟加载一般用于加载嵌套查询的对象？？？？？？
+   * @param ms
+   * @param resultObject result 对象是指最终返回给用户的那个对象
+   * @param property property 是 result 对象的一个属性
+   * @param key 缓存 key
+   * @param targetType property 的 java 类型
+   */
   @Override
   public void deferLoad(MappedStatement ms, MetaObject resultObject, String property, CacheKey key, Class<?> targetType) {
     if (closed) {
@@ -183,10 +192,22 @@ public abstract class BaseExecutor implements Executor {
     if (deferredLoad.canLoad()) {
       deferredLoad.load();
     } else {
+      // todo 应该直接把 deferredLoad 对象添加到 deferredLoads 中就可以吧
       deferredLoads.add(new DeferredLoad(resultObject, property, key, localCache, configuration, targetType));
     }
   }
 
+  /**
+   * 创建缓存的 key 时与所缓存的 MappedStatement（id）、每一个参数值、rowBounds（从哪一条记录开始到结束）、sql语句 、
+   * environment（在运行的时候 environment 的值还会发生改变？，如果只有一个 environment 的话，缓存就与 environment 无关了） 有关。
+   * todo 为什么有了与 MappedStatement（id） 相关还与 sql 语句相关？可能是因为 sql 语句中会有 ${name} ，
+   * 在运行的过程中 name 的值会发生变化？？？？
+   * @param ms
+   * @param parameterObject
+   * @param rowBounds
+   * @param boundSql
+   * @return
+   */
   @Override
   public CacheKey createCacheKey(MappedStatement ms, Object parameterObject, RowBounds rowBounds, BoundSql boundSql) {
     if (closed) {
@@ -342,7 +363,7 @@ public abstract class BaseExecutor implements Executor {
   }
 
   /**
-   * 延迟加载
+   * 延迟加载 和 懒加载还有些不一样，延迟加载时再 Executor 还没关闭前去加载，但懒加载是在用户真正需要使用对象的时候去加载，这时候 executor 早已经关闭了
    */
   private static class DeferredLoad {
 
@@ -378,6 +399,9 @@ public abstract class BaseExecutor implements Executor {
       return localCache.getObject(key) != null && localCache.getObject(key) != EXECUTION_PLACEHOLDER;
     }
 
+    /**
+     * 把缓存中的属性对象设置到 result 中
+     */
     public void load() {
       @SuppressWarnings( "unchecked" )
       // we suppose we get back a List
