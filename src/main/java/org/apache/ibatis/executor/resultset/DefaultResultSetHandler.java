@@ -137,6 +137,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     int resultSetCount = 0;
     ResultSetWrapper rsw = getFirstResultSet(stmt);
 
+    // todo 什么时候会出现多个 resultMap 呢？？？ 存储过程？？？
     List<ResultMap> resultMaps = mappedStatement.getResultMaps();
     int resultMapCount = resultMaps.size();
     validateResultMapsCount(rsw, resultMapCount);
@@ -149,6 +150,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       resultSetCount++;
     }
 
+    // todo 什么时候会出现多个 resultSet ???
     String[] resultSets = mappedStatement.getResulSets();
     if (resultSets != null) {
       while (rsw != null && resultSetCount < resultSets.length) {
@@ -294,6 +296,15 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     }
   }
 
+  /**
+   * todo ????
+   * @param resultHandler
+   * @param resultContext
+   * @param rowValue
+   * @param parentMapping
+   * @param rs
+     * @throws SQLException
+     */
   private void storeObject(ResultHandler<?> resultHandler, DefaultResultContext<Object> resultContext, Object rowValue, ResultMapping parentMapping, ResultSet rs) throws SQLException {
     if (parentMapping != null) {
       linkToParents(rs, parentMapping, rowValue);
@@ -341,6 +352,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         foundValues = applyAutomaticMappings(rsw, resultMap, metaObject, null) || foundValues;
       }
       // 给属性映射设置值 其中 属性映射 构造方法映射 自动映射这三者没有交集
+      // todo 属性映射和自动映射的顺序能不能交换???
       foundValues = applyPropertyMappings(rsw, resultMap, metaObject, lazyLoader, null) || foundValues;
       foundValues = lazyLoader.size() > 0 || foundValues;
       resultObject = foundValues ? resultObject : null;
@@ -373,6 +385,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     for (ResultMapping propertyMapping : propertyMappings) {
       String column = prependPrefix(propertyMapping.getColumn(), columnPrefix);
       if (propertyMapping.getNestedResultMapId() != null) {
+        // todo 为什么要忽略？？？？
         // the user added a column attribute to a nested result map, ignore it
         column = null;
       }

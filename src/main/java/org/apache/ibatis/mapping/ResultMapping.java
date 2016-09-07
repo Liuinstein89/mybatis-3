@@ -54,6 +54,7 @@ public class ResultMapping {
   // 组合列 column 和 select 是成对儿出现的，当他们出现的时候 <select id="selectClerkAddress" resultMap="clerkAddressResultMap"> 标签中是不需要参数的，
   // 因为参数实际上是由 column 传递过来的。
   private List<ResultMapping> composites;
+  // todo 这是干啥的？？？？
   private String resultSet;
   private String foreignColumn;
   private boolean lazy;
