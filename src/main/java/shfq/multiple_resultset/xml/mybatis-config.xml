@@ -29,7 +29,7 @@
         <setting name="mapUnderscoreToCamelCase" value="true"/>
     </settings>
     <typeAliases>
-        <typeAlias alias = "Student" type = "shfq.Student"/>
+        <typeAlias alias = "Student" type = "shfq.nested_result_map.vo.Student"/>
     </typeAliases>
     <environments default="development">
         <environment id="development">
@@ -38,17 +38,11 @@
                 <property name="driver" value="com.mysql.jdbc.Driver"/>
                 <property name="url" value="jdbc:mysql://localhost:3306/mybatis-demo"/>
                 <property name="username" value="root"/>
-                <property name="password" value="root"/>
+                <property name="password" value="123456"/>
             </dataSource>
         </environment>
     </environments>
     <mappers>
-        <!--<mapper resource="shfq/mappers/StudentQueryMapper.xml"/>-->
-        <!--<mapper resource="shfq/mappers/StudentUpdateMapper.xml"/>-->
-        <!--<mapper class="shfq.nested_result_map.mappers.StudentMapper"></mapper>-->
-        <!--<mapper class="shfq.nested_result_map.mappers.AddressMapper"/>-->
-        <!--<mapper class="shfq.one_many_annotation.PeopleMapper"/>-->
-        <!--<mapper class="shfq.one_many_annotation.PetMapper"/>-->
-        <mapper resource="shfq/mappers/PeopleMapper.xml"></mapper>
+        <mapper resource="shfq/nested_result_map/xml/addressMapper.xml"/>
     </mappers>
 </configuration>
