@@ -8,6 +8,8 @@
         <collection property="pets" ofType="shfq.one_many_annotation.Pet" resultSet="pets" column="id" foreignColumn="owner_id">
             <id property="id" column="id"></id>
             <result property="name" column="name"/>
+            <!--<association property="owner" resultMap="peopleResultMap" resultSet="peoples" column="owner_id" foreignColumn="id">-->
+            <!--</association>-->
         </collection>
     </resultMap>
 

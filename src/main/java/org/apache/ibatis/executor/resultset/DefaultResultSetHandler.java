@@ -213,7 +213,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   }
 
   private void cleanUpAfterHandlingResultSet() {
-    nestedResultObjects.clear();
+    nestedResultObjects.clear(); // todo 什么时候不为空
     ancestorColumnPrefix.clear();
   }
 
@@ -232,7 +232,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         handleRowValues(rsw, resultMap, null, RowBounds.DEFAULT, parentMapping);
       } else {
         // todo 什么时候 resultHandler 为 null？为什么 resultHandler 为 null 的时候 需要 multipleResults.add
-        // 而resultHanler 不为 null 的时候 却不需要？？？
+        // 而resultHandler 不为 null 的时候 却不需要？？？
         if (resultHandler == null) {
           DefaultResultHandler defaultResultHandler = new DefaultResultHandler(objectFactory);
           // todo 处理返回的一个结果集，一个结果集中可能有多条记录
@@ -344,7 +344,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     final ResultLoaderMap lazyLoader = new ResultLoaderMap();
     // todo 创建好的返回的对象
     Object resultObject = createResultObject(rsw, resultMap, lazyLoader, null);
-    if (resultObject != null && !typeHandlerRegistry.hasTypeHandler(resultMap.getType())) {
+    if (resultObject != null && !typeHandlerRegistry.hasTypeHandler(resultMap.getType())) { // todo 为什么注册器里有这个 typeHandler 就直接返回
       final MetaObject metaObject = configuration.newMetaObject(resultObject);
       boolean foundValues = !resultMap.getConstructorResultMappings().isEmpty();
       // 自动映射通过反射调用 set 方法设置属性值（给没有映射过的列设置属性值）
@@ -379,19 +379,19 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
   private boolean applyPropertyMappings(ResultSetWrapper rsw, ResultMap resultMap, MetaObject metaObject, ResultLoaderMap lazyLoader, String columnPrefix)
       throws SQLException {
-    final List<String> mappedColumnNames = rsw.getMappedColumnNames(resultMap, columnPrefix);
+    final List<String> mappedColumnNames = rsw.getMappedColumnNames(resultMap, columnPrefix); // todo 什么时候 mappedColumnNames 不为空？？？
     boolean foundValues = false;
     final List<ResultMapping> propertyMappings = resultMap.getPropertyResultMappings();
     for (ResultMapping propertyMapping : propertyMappings) {
       String column = prependPrefix(propertyMapping.getColumn(), columnPrefix);
       if (propertyMapping.getNestedResultMapId() != null) {
-        // todo 为什么要忽略？？？？
+        // todo 为什么要忽略？？？？ 什么时候可以忽略
         // the user added a column attribute to a nested result map, ignore it
         column = null;
       }
       if (propertyMapping.isCompositeResult()
           || (column != null && mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH)))
-          || propertyMapping.getResultSet() != null) {
+          || propertyMapping.getResultSet() != null) { // todo mappedColumnNames 是干啥的？？？ 为啥 mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH))
         Object value = getPropertyMappingValue(rsw.getResultSet(), metaObject, propertyMapping, lazyLoader, columnPrefix);
         // issue #541 make property optional
         final String property = propertyMapping.getProperty();
@@ -425,7 +425,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     if (propertyMapping.getNestedQueryId() != null) {
       return getNestedQueryMappingValue(rs, metaResultObject, propertyMapping, lazyLoader, columnPrefix);
     } else if (propertyMapping.getResultSet() != null) {
-      // todo propertyMapping.getResultSet() != null 这种情况是哪种情况????
+      // todo propertyMapping.getResultSet() != null 这种情况是哪种情况???? 有存储过程的时候
       addPendingChildRelation(rs, metaResultObject, propertyMapping);   // TODO is that OK?
       return DEFERED;
     } else {
@@ -440,6 +440,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   private boolean applyAutomaticMappings(ResultSetWrapper rsw, ResultMap resultMap, MetaObject metaObject, String columnPrefix) throws SQLException {
     final List<String> unmappedColumnNames = rsw.getUnmappedColumnNames(resultMap, columnPrefix);
     boolean foundValues = false;
+    // todo 什么时候 unmappedColumnNames 不为空？？？？
     for (String columnName : unmappedColumnNames) {
       String propertyName = columnName;
       if (columnPrefix != null && !columnPrefix.isEmpty()) {
