@@ -43,6 +43,6 @@
         </environment>
     </environments>
     <mappers>
-        <mapper resource="shfq/nested_result_map/xml/addressMapper.xml"/>
+        <mapper resource="shfq/multiple_resultset/xml/caller.xml"/>
     </mappers>
 </configuration>
