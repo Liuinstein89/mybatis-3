@@ -1,0 +1,17 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="shfq.multiple_resultset.xml.caller">
+    <resultMap id="peopleResultMap" type="shfq.one_many_annotation.People">
+        <id column="id" property="id"></id>
+        <result column="name" property="name"></result>
+        <collection property="pets" ofType="shfq.one_many_annotation.Pet" resultSet="pets" column="id" foreignColumn="owner_id">
+            <id property="id" column="id"></id>
+            <result property="name" column="name"/>
+        </collection>
+    </resultMap>
+
+    <select id="callProcedure" resultSets="peoples,pets" resultMap="peopleResultMap" statementType="CALLABLE">
+        {call Proc(#{paramId,jdbcType=INTEGER,mode=IN})}
+    </select>
+</mapper>
