@@ -67,7 +67,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
   // multiple resultsets
   private final Map<String, ResultMapping> nextResultMaps = new HashMap<String, ResultMapping>();
-  private final Map<CacheKey, List<PendingRelation>> pendingRelations = new HashMap<CacheKey, List<PendingRelation>>();
+  private final Map<CacheKey, List<PendingRelation>> pendingRelations = new HashMap<CacheKey, List<PendingRelation>>(); // todo 一个 cacheKey 其实代表了一个 result 对象，同一个 result 对象可能需要多次链接到父对象上，比如 A 有属性 B1 和 B2，其中属性 B1 和 B2 是同一个对象
 
   private static class PendingRelation {
     public MetaObject metaObject;
@@ -150,7 +150,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       resultSetCount++;
     }
 
-    // todo 什么时候会出现多个 resultSet ???
+    // todo 什么时候会出现多个 resultSet ??? 有存储过程的时候会出现
     String[] resultSets = mappedStatement.getResulSets();
     if (resultSets != null) {
       while (rsw != null && resultSetCount < resultSets.length) {
@@ -227,7 +227,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   // todo 处理返回的一个结果集
   private void handleResultSet(ResultSetWrapper rsw, ResultMap resultMap, List<Object> multipleResults, ResultMapping parentMapping) throws SQLException {
     try {
-      // todo 什么时候会有 parentMapping ????
+      // todo 什么时候会有 parentMapping ???? 存储过程有多个结果集的时候会有
       if (parentMapping != null) {
         handleRowValues(rsw, resultMap, null, RowBounds.DEFAULT, parentMapping);
       } else {
@@ -344,7 +344,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     final ResultLoaderMap lazyLoader = new ResultLoaderMap();
     // todo 创建好的返回的对象
     Object resultObject = createResultObject(rsw, resultMap, lazyLoader, null);
-    if (resultObject != null && !typeHandlerRegistry.hasTypeHandler(resultMap.getType())) { // todo 为什么注册器里有这个 typeHandler 就直接返回
+    if (resultObject != null && !typeHandlerRegistry.hasTypeHandler(resultMap.getType())) { // todo 为什么注册器里有这个 typeHandler 就直接返回 因为注册器里注册的都是简单的类型，例如 String，int,float 而不是复杂的自定义对象，所以直接返回即可
       final MetaObject metaObject = configuration.newMetaObject(resultObject);
       boolean foundValues = !resultMap.getConstructorResultMappings().isEmpty();
       // 自动映射通过反射调用 set 方法设置属性值（给没有映射过的列设置属性值）
@@ -486,6 +486,13 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     }
   }
 
+  /**
+   * 添加待定的子关系 只有在多个结果集（存储过程）中才会用到它
+   * @param rs
+   * @param metaResultObject
+   * @param parentMapping
+   * @throws SQLException
+   */
   private void addPendingChildRelation(ResultSet rs, MetaObject metaResultObject, ResultMapping parentMapping) throws SQLException {
     CacheKey cacheKey = createKeyForMultipleResults(rs, parentMapping, parentMapping.getColumn(), parentMapping.getColumn());
     PendingRelation deferLoad = new PendingRelation();
@@ -508,6 +515,17 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     }
   }
 
+  /**
+   * 为 multiple result（只有存储过程才可能有多个结果集） 创建缓存 key
+   * 缓存 key 与 resultMapping 有关系，属性名称以及该属性名称相应的值。
+   * 其实是相当于给 result 对象创建了 cacheKey 。如果 names 是 id 的话，如果不是则表示的应该是所有的属性，所有的属性都一样，才表示对象相同
+   * @param rs
+   * @param resultMapping
+   * @param names
+   * @param columns 作用主要是根据 列名 在 resultSet 中取出对应的值
+   * @return
+   * @throws SQLException
+   */
   private CacheKey createKeyForMultipleResults(ResultSet rs, ResultMapping resultMapping, String names, String columns) throws SQLException {
     CacheKey cacheKey = new CacheKey();
     cacheKey.update(resultMapping);
@@ -1012,9 +1030,16 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     return CacheKey.NULL_CACHE_KEY;
   }
 
+  /**
+   * 为了构建 rowKey 而获取 resultMapping
+   * @param resultMap
+   * @return
+   */
   private List<ResultMapping> getResultMappingsForRowKey(ResultMap resultMap) {
+    // id 当然是作为缓存 key 的理想对象
     List<ResultMapping> resultMappings = resultMap.getIdResultMappings();
     if (resultMappings.size() == 0) {
+      // 如果没有 id 的话则需要每个 PropertyResultMapping
       resultMappings = resultMap.getPropertyResultMappings();
     }
     return resultMappings;
@@ -1066,6 +1091,12 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     }
   }
 
+  /**
+   * 为 resultSet 创建缓存 一个 resultSet 其实就是好多个 键值对儿（列名和对应的值） 所以需要更新每个 列名和值
+   * @param rsw
+   * @param cacheKey
+   * @throws SQLException
+   */
   private void createRowKeyForMap(ResultSetWrapper rsw, CacheKey cacheKey) throws SQLException {
     List<String> columnNames = rsw.getColumnNames();
     for (String columnName : columnNames) {
@@ -1077,16 +1108,30 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     }
   }
 
+  /**
+   * 把 rowValue 对象链接到相关的对象上
+   * @param metaObject
+   * @param resultMapping
+   * @param rowValue
+   */
   private void linkObjects(MetaObject metaObject, ResultMapping resultMapping, Object rowValue) {
     final Object collectionProperty = instantiateCollectionPropertyIfAppropriate(resultMapping, metaObject);
     if (collectionProperty != null) {
+      // 如果是集合的话，则把 rowValue 添加到集合中
       final MetaObject targetMetaObject = configuration.newMetaObject(collectionProperty);
       targetMetaObject.add(rowValue);
     } else {
+      // 如果是非集合的话，直接反射调用设置值
       metaObject.setValue(resultMapping.getProperty(), rowValue);
     }
   }
 
+  /**
+   * 实例化集合属性
+   * @param resultMapping
+   * @param metaObject
+   * @return 如果属性是集合类型则返回集合对象，否则返回 null
+   */
   private Object instantiateCollectionPropertyIfAppropriate(ResultMapping resultMapping, MetaObject metaObject) {
     final String propertyName = resultMapping.getProperty();
     Object propertyValue = metaObject.getValue(propertyName);
@@ -1105,6 +1150,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         throw new ExecutorException("Error instantiating collection property for result '" + resultMapping.getProperty() + "'.  Cause: " + e, e);
       }
     } else if (objectFactory.isCollection(propertyValue.getClass())) {
+      // todo 设置 list 中的每个值时需要调用 instantiateCollectionPropertyIfAppropriate ，自然 list 不为空时就会走到这儿
       return propertyValue;
     }
     return null;

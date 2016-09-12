@@ -7,5 +7,5 @@ begin
 	select * from people where id=paramId;
 	select * from pet where owner_id=paramId;
 end //
-delimiter;
+delimiter ;
 
