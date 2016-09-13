@@ -62,7 +62,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
     this.currentNamespace = currentNamespace;
   }
 
-  public String applyCurrentNamespace(String base, boolean isReference) {
+  public String applyCurrentNamespace(String base, boolean isReference) { // todo isReference 是什么 表示的是引用的是其他 namespace 的？？？？
     if (base == null) {
       return null;
     }

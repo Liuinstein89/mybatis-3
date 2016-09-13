@@ -15,3 +15,5 @@ type 用于 resultMap 映射的目标类型
 有 <constructor/> 、<discriminator/> 的情况
 
 有 <constructor/> 或 <association/> 的情况下同时有 select 属性。XmlMapperBuilder.processNestedResultMappings()
+
+组合列：MapperBuilderAssistant.parseCompositeColumnName()

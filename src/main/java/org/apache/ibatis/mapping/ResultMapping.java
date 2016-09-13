@@ -149,7 +149,7 @@ public class ResultMapping {
       // lock down collections
       resultMapping.flags = Collections.unmodifiableList(resultMapping.flags);
       resultMapping.composites = Collections.unmodifiableList(resultMapping.composites);
-      resolveTypeHandler();
+      resolveTypeHandler(); // 怎样解析 typeHandler 如果 resultMapping 对应的是一个复杂的 collection or association
       validate();
       return resultMapping;
     }
