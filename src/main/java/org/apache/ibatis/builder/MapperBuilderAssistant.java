@@ -362,7 +362,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
   }
 
   public ResultMapping buildResultMapping(
-      Class<?> resultType,
+      Class<?> resultType, // 它的作用主要是如果 javaType 为空，通过反射获取 property 的类型
       String property,
       String column,
       Class<?> javaType,

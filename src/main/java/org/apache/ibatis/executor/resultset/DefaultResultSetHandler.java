@@ -137,7 +137,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     int resultSetCount = 0;
     ResultSetWrapper rsw = getFirstResultSet(stmt);
 
-    // todo 什么时候会出现多个 resultMap 呢？？？ 存储过程？？？
+    // todo 什么时候会出现多个 resultMap 呢？？？ 存储过程？？？ 应该是存储过程，如果是非存储过程的话，只会有一个结果集，handleResultSet(rsw, resultMap, multipleResults, null);处理完一个 resultMap 之后结果集就关闭了
     List<ResultMap> resultMaps = mappedStatement.getResultMaps();
     int resultMapCount = resultMaps.size();
     validateResultMapsCount(rsw, resultMapCount);
@@ -239,7 +239,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
           handleRowValues(rsw, resultMap, defaultResultHandler, rowBounds, null);
           multipleResults.add(defaultResultHandler.getResultList());
         } else {
-          handleRowValues(rsw, resultMap, resultHandler, rowBounds, null);
+          handleRowValues(rsw, resultMap, resultHandler, rowBounds, null); // todo 为什么有了 resultHandler 之后就不需要 multipleResults.add(defaultResultHandler.getResultList()); bug?还是故意的？？
         }
       }
     } finally {
@@ -1031,7 +1031,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   }
 
   /**
-   * 为了构建 rowKey 而获取 resultMapping
+   * 获取 resultMapping 为构建 row 缓存 key 做准备工作
    * @param resultMap
    * @return
    */
@@ -1045,19 +1045,28 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     return resultMappings;
   }
 
+  /**
+   * 递归调用设置一个对象的缓存 key
+   * @param resultMap
+   * @param rsw
+   * @param cacheKey
+   * @param resultMappings
+   * @param columnPrefix
+   * @throws SQLException
+   */
   private void createRowKeyForMappedProperties(ResultMap resultMap, ResultSetWrapper rsw, CacheKey cacheKey, List<ResultMapping> resultMappings, String columnPrefix) throws SQLException {
     for (ResultMapping resultMapping : resultMappings) {
-      if (resultMapping.getNestedResultMapId() != null && resultMapping.getResultSet() == null) {
+      if (resultMapping.getNestedResultMapId() != null && resultMapping.getResultSet() == null) { // resultMapping.getResultSet() != null 时，其结果集是另外一个结果集而不是当前结果集，所以没法缓存
         // Issue #392
         final ResultMap nestedResultMap = configuration.getResultMap(resultMapping.getNestedResultMapId());
         createRowKeyForMappedProperties(nestedResultMap, rsw, cacheKey, nestedResultMap.getConstructorResultMappings(),
             prependPrefix(resultMapping.getColumnPrefix(), columnPrefix));
-      } else if (resultMapping.getNestedQueryId() == null) {
+      } else if (resultMapping.getNestedQueryId() == null) { // todo 如果有嵌套查询的话，则不需要加上缓存 key ，加上缓存 key 的时候一般是把某一行数据的某几列的列名和列值都更新，那这样会不会出问题，根据缓存不能区分出是不是同一个对象
         final String column = prependPrefix(resultMapping.getColumn(), columnPrefix);
         final TypeHandler<?> th = resultMapping.getTypeHandler();
         List<String> mappedColumnNames = rsw.getMappedColumnNames(resultMap, columnPrefix);
         // Issue #114
-        if (column != null && mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH))) {
+        if (column != null && mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH))) {// todo column 是不是可能会有组合列出现的情况
           final Object value = th.getResult(rsw.getResultSet(), column);
           if (value != null) {
             cacheKey.update(column);

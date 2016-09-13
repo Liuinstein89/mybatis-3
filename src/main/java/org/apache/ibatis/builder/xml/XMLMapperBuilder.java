@@ -270,7 +270,7 @@ public class XMLMapperBuilder extends BaseBuilder {
       } else if ("discriminator".equals(resultChild.getName())) {
         discriminator = processDiscriminatorElement(resultChild, typeClass, resultMappings);
       } else {
-        // association collection id result
+        // <association/> <collection/> <id/> <result/>
         List<ResultFlag> flags = new ArrayList<ResultFlag>();
         // id
         if ("id".equals(resultChild.getName())) {
@@ -370,7 +370,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     return true;
   }
 
-  // 处理 association collection id result 的映射
+  // 处理 <association/> <collection/> <id/> <result/> 的映射
   private ResultMapping buildResultMappingFromContext(XNode context, Class<?> resultType, List<ResultFlag> flags) throws Exception {
     String property = context.getStringAttribute("property");
     String column = context.getStringAttribute("column");
@@ -409,7 +409,7 @@ public class XMLMapperBuilder extends BaseBuilder {
   private String processNestedResultMappings(XNode context, List<ResultMapping> resultMappings) throws Exception {
     if ("association".equals(context.getName())
         || "collection".equals(context.getName())
-        || "case".equals(context.getName())) {
+        || "case".equals(context.getName())) { // todo <case/> 里面没有 select 属性，|| "case".equals(context.getName()) 这句是不是就没必要了
       if (context.getStringAttribute("select") == null) {
         ResultMap resultMap = resultMapElement(context, resultMappings);
         return resultMap.getId();

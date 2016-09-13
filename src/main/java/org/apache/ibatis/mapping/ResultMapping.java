@@ -29,7 +29,7 @@ import java.util.Set;
  * @author Clinton Begin
  * 一个对象中的属性的映射 这个属性可能是简单的类型比如 int(数值型) boolean String 等也可能是自定义的对象类型
  * 简单的类型 比如一个 int 属性对应着结果集中的一个列字段
- * 复杂的自定义类型 比如一个 clerkAddress 对应着一个嵌套结果集的 id
+ * 复杂的自定义类型 比如一个 clerkAddress 对应着一个嵌套结果集的 id <association/> <collection/>
  */
 public class ResultMapping {
 
@@ -54,9 +54,9 @@ public class ResultMapping {
   // 组合列 column 和 select 是成对儿出现的，当他们出现的时候 <select id="selectClerkAddress" resultMap="clerkAddressResultMap"> 标签中是不需要参数的，
   // 因为参数实际上是由 column 传递过来的。
   private List<ResultMapping> composites;
-  // todo 这是干啥的？？？？
+  // todo 这是干啥的？？？？ 只有在存储过程中才会出现 resultSet
   private String resultSet;
-  private String foreignColumn;
+  private String foreignColumn; // 只有在存储过程中出现的时候才会用到 需要 foreignColumn 和 column 配合使用 column 代表的是 父对象的主键名称（如果没有主键的话则是查询语句中所有列的名称）foreginColumn 代表的是子对象中关联父对象的外键列名
   private boolean lazy;
 
   ResultMapping() {

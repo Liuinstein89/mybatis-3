@@ -21,7 +21,7 @@ import java.util.*;
 
 /**
  * @author Clinton Begin
- * ResultMap 是对查询出来的结果集到返回对象整体映射所需的条件的一个封装
+ * ResultMap 是对查询出来的结果集到返回对象整体映射所需的条件的一个封装 resultMap 可能是 <resultMap> <case> <association> <collection>
  *
  */
 public class ResultMap {
@@ -41,7 +41,7 @@ public class ResultMap {
   // 已经映射过的列名集合，已经映射过的列名不会再次给相应的属性设值，比如在构造方法中出现过的列名就属于已经映射过的列名。
   private Set<String> mappedColumns;
   private Discriminator discriminator;
-  private boolean hasNestedResultMaps;
+  private boolean hasNestedResultMaps; // resultMap 里是否有嵌套 resultMap ，如果一个 resultMap 里的 resultMapping 里有 resultMap 或者是 resultSet 都算是有嵌套映射
   // 有没有嵌套查询 例如在 mapper 中有 annotation @One @Many 就是嵌套查询
   private boolean hasNestedQueries;
   private Boolean autoMapping;
