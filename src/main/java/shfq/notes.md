@@ -17,3 +17,8 @@ type 用于 resultMap 映射的目标类型
 有 <constructor/> 或 <association/> 的情况下同时有 select 属性。XmlMapperBuilder.processNestedResultMappings()
 
 组合列：MapperBuilderAssistant.parseCompositeColumnName()
+resultMap extend
+
+在 resultMap 中 有 <constructor/> 同时又有组合列 并且有一个列的值既是 构造方法的参数 同时也是组合列的一列会不会出问题？？
+
+Configuration.checkLocallyForDiscriminatedNestedResultMaps();

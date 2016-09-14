@@ -22,7 +22,7 @@ import java.util.Map;
 
 /**
  * @author Clinton Begin
- * Discriminator 本质上是一个 ResultMapping ，只不过这个 ResultMapping 映射的是用户自定义的一个复杂的对象
+ * Discriminator todo 本质上是一个 ResultMapping ，只不过这个 ResultMapping 映射的是用户自定义的一个复杂的对象????感觉还是不准确 感觉 Discriminator 更像一个 resultMap
  */
 public class Discriminator {
 

@@ -29,7 +29,7 @@ import java.util.Set;
  * @author Clinton Begin
  * 一个对象中的属性的映射 这个属性可能是简单的类型比如 int(数值型) boolean String 等也可能是自定义的对象类型
  * 简单的类型 比如一个 int 属性对应着结果集中的一个列字段
- * 复杂的自定义类型 比如一个 clerkAddress 对应着一个嵌套结果集的 id <association/> <collection/>
+ * 复杂的自定义类型 比如一个 clerkAddress 对应着一个嵌套结果集的 id <association/> <collection/> <case/>
  */
 public class ResultMapping {
 

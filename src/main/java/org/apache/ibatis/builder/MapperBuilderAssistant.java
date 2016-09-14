@@ -167,7 +167,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
     extend = applyCurrentNamespace(extend, true);
 
     ResultMap.Builder resultMapBuilder = new ResultMap.Builder(configuration, id, type, resultMappings, autoMapping);
-    if (extend != null) {
+    if (extend != null) { // todo 没用过 extend
       if (!configuration.hasResultMap(extend)) {
         throw new IncompleteElementException("Could not find a parent resultmap with id '" + extend + "'");
       }

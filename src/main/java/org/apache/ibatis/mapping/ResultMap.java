@@ -28,21 +28,21 @@ public class ResultMap {
   // 如果是 mapper 的话 id 是 包名.类名.方法名-参数类型
   // 关联着一条 sql 语句
   private String id;
-  // 返回的对象的类型
+  // 返回的对象的类型 如果返回的是集合的话，type 则是集合元素的类型
   private Class<?> type;
   private List<ResultMapping> resultMappings;
-  // 在 mapper 中 @ConstructorArgs 中如果有 @Arg id=true 的话，则添加在 list 中，如果 list 为空的话，则把所有的 ResultMapping 都添加到 list 中
+  // 在 mapper 中 @ConstructorArgs 中如果有 @Arg id=true 的话，则添加在 list 中，如果 list 为空的话，则把所有的 ResultMapping 都添加到 list 中 idResultMappings 主要用于本地缓存，如果没有 idResultMapping 的话，则把所有的列都作为 idResultMappings，因为如果有 id 的话 id 可以唯一的区分查出来的这一行数据，如果没有的话则把所有的列都需要加入
   private List<ResultMapping> idResultMappings;
   // 在 mapper 中 @ConstructorArgs 中出现的都属于 constructorResultMappings
   // 同一个 ResultMapping 不会同时出现在 constructorResultMappings 和 propertyResultMappings 两个 list 中
-  // 为什么不会同时出现呢？constructorResultMappings 会在创建构造方法的时候设置属性值，如果在构造方法中出现过的当然不需要再次重新设置属性值
+  // 为什么不会同时出现呢？constructorResultMappings 会在创建构造方法的时候设置属性值，如果在构造方法中出现过的当然不需要再次重新设置属性值 constructorResultMappings + propertyResultMappings = resultMapping
   private List<ResultMapping> constructorResultMappings;
   private List<ResultMapping> propertyResultMappings;
-  // 已经映射过的列名集合，已经映射过的列名不会再次给相应的属性设值，比如在构造方法中出现过的列名就属于已经映射过的列名。
+  // todo 已经映射过的列名集合，已经映射过的列名不会再次给相应的属性设值，比如在构造方法中出现过的列名就属于已经映射过的列名。错误吧 正解应该是 需要映射的列集合，比如一个 select * 可能查询出好多列，但我只想映射其中的两列，多余的可以不映射。
   private Set<String> mappedColumns;
   private Discriminator discriminator;
-  private boolean hasNestedResultMaps; // resultMap 里是否有嵌套 resultMap ，如果一个 resultMap 里的 resultMapping 里有 resultMap 或者是 resultSet 都算是有嵌套映射
-  // 有没有嵌套查询 例如在 mapper 中有 annotation @One @Many 就是嵌套查询
+  private boolean hasNestedResultMaps; // todo resultMap 里是否有嵌套 resultMap ，如果一个 resultMap 里的任一个 resultMapping 里有 resultMap 并且 resultSet 为空的话 好像还有其他的特殊情况，会调用 forceNestedResultMaps() 方法 就算有嵌套映射 为什么还需要有 resultSet 为空的条件，可能是 resultMap 和它的嵌套 resultMap 映射的是同一个结果集中的数据。有了 resultSet 后 resultMap 和它的 resultMap 是从不同的结果集中抽取数据。
+  // todo 有没有嵌套查询 例如在 mapper 中有 annotation @One @Many 就是嵌套查询???? resultMap 里 只要有一个 resultMapping 有嵌套查询则该 resultMap 是有嵌套查询的
   private boolean hasNestedQueries;
   private Boolean autoMapping;
 
@@ -104,7 +104,7 @@ public class ResultMap {
         }
       }
       if (resultMap.idResultMappings.isEmpty()) {
-        // 为什么要全部添加
+        // 为什么要全部添加？ 因为 idResultMappings 主要用于本地缓存，如果没有 idResultMapping 的话，则把所有的列都作为 idResultMappings，因为如果有 id 的话 id 可以唯一的区分查出来的这一行数据，如果没有的话则把所有的列都需要加入
         resultMap.idResultMappings.addAll(resultMap.resultMappings);
       }
       // lock down collections

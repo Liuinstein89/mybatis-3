@@ -1003,6 +1003,8 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   private CacheKey createRowKey(ResultMap resultMap, ResultSetWrapper rsw, String columnPrefix) throws SQLException {
     final CacheKey cacheKey = new CacheKey();
     cacheKey.update(resultMap.getId());
+
+    ddddd
     List<ResultMapping> resultMappings = getResultMappingsForRowKey(resultMap);
     if (resultMappings.size() == 0) {
       if (Map.class.isAssignableFrom(resultMap.getType())) {
@@ -1038,7 +1040,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   private List<ResultMapping> getResultMappingsForRowKey(ResultMap resultMap) {
     // id 当然是作为缓存 key 的理想对象
     List<ResultMapping> resultMappings = resultMap.getIdResultMappings();
-    if (resultMappings.size() == 0) {
+    if (resultMappings.size() == 0) { // todo 应该走不到这儿，在 build resultMap 的时候如果没有 id ，就会把所有的 resultMapping 添加到 idResultMappings
       // 如果没有 id 的话则需要每个 PropertyResultMapping
       resultMappings = resultMap.getPropertyResultMappings();
     }

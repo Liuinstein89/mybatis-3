@@ -409,7 +409,7 @@ public class XMLMapperBuilder extends BaseBuilder {
   private String processNestedResultMappings(XNode context, List<ResultMapping> resultMappings) throws Exception {
     if ("association".equals(context.getName())
         || "collection".equals(context.getName())
-        || "case".equals(context.getName())) { // todo <case/> 里面没有 select 属性，|| "case".equals(context.getName()) 这句是不是就没必要了
+        || "case".equals(context.getName())) { // todo 为什么有了 "select" 就不需要继续查找是否有 nestedResultMap 了 因为嵌套 resultMap 都是从同一个结果集中抽取数据，而 "select" 是从另外一条语句查询，是另外一个结果集，所以。。。 ？？？
       if (context.getStringAttribute("select") == null) {
         ResultMap resultMap = resultMapElement(context, resultMappings);
         return resultMap.getId();

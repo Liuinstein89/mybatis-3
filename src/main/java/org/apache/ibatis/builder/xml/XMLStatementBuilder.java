@@ -74,7 +74,7 @@ public class XMLStatementBuilder extends BaseBuilder {
     String nodeName = context.getNode().getNodeName();
     SqlCommandType sqlCommandType = SqlCommandType.valueOf(nodeName.toUpperCase(Locale.ENGLISH));
     boolean isSelect = sqlCommandType == SqlCommandType.SELECT;
-    // 查询语句不需要刷新缓存，其他语句都需要刷新缓存
+    // 查询语句默认是不需要刷新缓存，其他更新语句默认是需要刷新缓存的，但如果设置了是否刷新则以设置的值为准，如果没有设置值则以默认值为准
     boolean flushCache = context.getBooleanAttribute("flushCache", !isSelect);
     // 只有查询语句才会使用缓存，其他语句都不需要使用缓存
     boolean useCache = context.getBooleanAttribute("useCache", isSelect);
