@@ -440,6 +440,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   private boolean applyAutomaticMappings(ResultSetWrapper rsw, ResultMap resultMap, MetaObject metaObject, String columnPrefix) throws SQLException {
     final List<String> unmappedColumnNames = rsw.getUnmappedColumnNames(resultMap, columnPrefix);
     boolean foundValues = false;
+    dd 阅读到这儿了
     // todo 什么时候 unmappedColumnNames 不为空？？？？
     for (String columnName : unmappedColumnNames) {
       String propertyName = columnName;
@@ -552,7 +553,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     final List<Object> constructorArgs = new ArrayList<Object>();
     // todo 创建的返回的对象
     final Object resultObject = createResultObject(rsw, resultMap, constructorArgTypes, constructorArgs, columnPrefix);
-    if (resultObject != null && !typeHandlerRegistry.hasTypeHandler(resultMap.getType())) {
+    if (resultObject != null && !typeHandlerRegistry.hasTypeHandler(resultMap.getType())) { // 说明这个 resultObject 是个复杂对象，简单对象比如 int String 直接返回即可，简单对象类型会在 typeHandlerRegistry 里注册
       final List<ResultMapping> propertyMappings = resultMap.getPropertyResultMappings();
       // todo ？只要有一个属性配置了懒加载就需要创建代理对象？？？
       for (ResultMapping propertyMapping : propertyMappings) {
