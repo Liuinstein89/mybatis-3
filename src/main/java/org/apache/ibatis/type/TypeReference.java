@@ -26,7 +26,7 @@ import java.lang.reflect.Type;
  * @since 3.1.0
  */
 public abstract class TypeReference<T> {
-
+  // 泛型中的参数化类型 例如 List<String> rawType 就是指 String 类型
   private final Type rawType;
 
   protected TypeReference() {

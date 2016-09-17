@@ -37,6 +37,7 @@ public class ResultMap {
   // 同一个 ResultMapping 不会同时出现在 constructorResultMappings 和 propertyResultMappings 两个 list 中
   // 为什么不会同时出现呢？constructorResultMappings 会在创建构造方法的时候设置属性值，如果在构造方法中出现过的当然不需要再次重新设置属性值 constructorResultMappings + propertyResultMappings = resultMapping
   private List<ResultMapping> constructorResultMappings;
+  // 属性 resultMapping 可能会空，如果所有的映射都是通过构造方法进行的话
   private List<ResultMapping> propertyResultMappings;
   // todo 已经映射过的列名集合，已经映射过的列名不会再次给相应的属性设值，比如在构造方法中出现过的列名就属于已经映射过的列名。错误吧 正解应该是 需要映射的列集合，比如一个 select * 可能查询出好多列，但我只想映射其中的两列，多余的可以不映射。
   private Set<String> mappedColumns;

@@ -33,14 +33,14 @@ class ResultSetWrapper {
 
   private final ResultSet resultSet;
   private final TypeHandlerRegistry typeHandlerRegistry;
-  // 列的别名或列名
+  // 结果集中返回的所有的列的别名或列名
   private final List<String> columnNames = new ArrayList<String>();
   // 列的 java 类型
   private final List<String> classNames = new ArrayList<String>();
   // 列的 jdbc 类型
   private final List<JdbcType> jdbcTypes = new ArrayList<JdbcType>();
   // todo 为什么要设计成这样？ 键是一个列的名称，值是 map
-  // 难道是因为 discriminator 的缘故，同一个列，值不同，返回的类型也不同
+  // todo 难道是因为 discriminator 的缘故，同一个列，值不同，返回的类型也不同?应该不是这样的原因
   private final Map<String, Map<Class<?>, TypeHandler<?>>> typeHandlerMap = new HashMap<String, Map<Class<?>, TypeHandler<?>>>();
 
   // 假设 Map<String, List<String>> 中的 值一个 list 是 mappedColumnNames，则 mappedColumnNames + unMappedColumnNames = columnNames
@@ -48,10 +48,10 @@ class ResultSetWrapper {
   // unMappedColumnNames 却不一定是，它里面可能包含了其他 resultMap 映射的所有的列。
   // mappedColumnNames
   // 为什么要设计成这样的结构呢，即 Map 里的值是 List 因为一个结果集里可能需要映射多个 ResultMap 一个 ResultMap 需要对应一个 List
-  // 键是 resultMap + : + columnPrefix 组成
+  // 键是 resultMap + : + columnPrefix 组成 某个 resultMap 中需要映射的所有列
   private Map<String, List<String>> mappedColumnNamesMap = new HashMap<String, List<String>>();
   // 为什么要设计成这样的结构呢，即 Map 里的值是 List 因为一个结果集里可能需要映射多个 ResultMap 一个 ResultMap 需要对应一个 List
-
+  // 某个 resultMap 中不需要映射的列，即 columnNames - mappedColumnNames(某个 resultMap 中 mappedCoulumnNames)
   private Map<String, List<String>> unMappedColumnNamesMap = new HashMap<String, List<String>>();
 
   public ResultSetWrapper(ResultSet rs, Configuration configuration) throws SQLException {
@@ -132,6 +132,13 @@ class ResultSetWrapper {
     }
   }
 
+
+  /**
+   * 加载某个 resultMap 的 mappedColumnNames 和 unmappedColumnNames
+   * @param resultMap
+   * @param columnPrefix
+   * @throws SQLException
+     */
   private void loadMappedAndUnmappedColumnNames(ResultMap resultMap, String columnPrefix) throws SQLException {
     List<String> mappedColumnNames = new ArrayList<String>();
     List<String> unmappedColumnNames = new ArrayList<String>();

@@ -22,6 +22,7 @@ import java.sql.SQLException;
 
 /**
  * @author Clinton Begin
+ * 数据库中保存的是枚举实例的名称，字符串与枚举值之间的相互转换
  */
 public class EnumTypeHandler<E extends Enum<E>> extends BaseTypeHandler<E> {
 
@@ -34,6 +35,14 @@ public class EnumTypeHandler<E extends Enum<E>> extends BaseTypeHandler<E> {
     this.type = type;
   }
 
+  /**
+   * 参见 Enum 类的 name() 方法，返回的是实例的名称
+   * @param ps
+   * @param i
+   * @param parameter
+   * @param jdbcType
+   * @throws SQLException
+     */
   @Override
   public void setNonNullParameter(PreparedStatement ps, int i, E parameter, JdbcType jdbcType) throws SQLException {
     if (jdbcType == null) {

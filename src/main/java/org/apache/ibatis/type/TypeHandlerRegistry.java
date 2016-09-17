@@ -32,6 +32,7 @@ public final class TypeHandlerRegistry {
   private final Map<JdbcType, TypeHandler<?>> JDBC_TYPE_HANDLER_MAP = new EnumMap<JdbcType, TypeHandler<?>>(JdbcType.class);
   private final Map<Type, Map<JdbcType, TypeHandler<?>>> TYPE_HANDLER_MAP = new HashMap<Type, Map<JdbcType, TypeHandler<?>>>();
   private final TypeHandler<Object> UNKNOWN_TYPE_HANDLER = new UnknownTypeHandler(this);
+  // typeHandler 的集合，键是 typeHandler 的 Java 类型
   private final Map<Class<?>, TypeHandler<?>> ALL_TYPE_HANDLERS_MAP = new HashMap<Class<?>, TypeHandler<?>>();
 
   public TypeHandlerRegistry() {
@@ -245,6 +246,13 @@ public final class TypeHandlerRegistry {
     register((Type) type, jdbcType, handler);
   }
 
+  /**
+   * 一种 Java 类型对应着多种 jdbc 类型，但一种 jdbc 类型只对应着一种 typeHandler
+   * 所以一种 Java 类型对应着多种 typeHandler
+   * @param javaType
+   * @param jdbcType
+   * @param handler
+     */
   private void register(Type javaType, JdbcType jdbcType, TypeHandler<?> handler) {
     if (javaType != null) {
       Map<JdbcType, TypeHandler<?>> map = TYPE_HANDLER_MAP.get(javaType);
@@ -291,10 +299,20 @@ public final class TypeHandlerRegistry {
 
   // Construct a handler (used also from Builders)
 
+  /**
+   * TypeHandler 要么没有构造方法，要么有一个只有一个参数，并且参数类型是 Class.class 的构造方法
+   * 利用 typeHandlerClass 的构造方法来构造 typeHandler
+   * @param javaTypeClass
+   * @param typeHandlerClass
+   * @param <T>
+     * @return
+     */
   @SuppressWarnings("unchecked")
   public <T> TypeHandler<T> getInstance(Class<?> javaTypeClass, Class<?> typeHandlerClass) {
     if (javaTypeClass != null) {
-      try { // 需要找一个带有参数的构造方法，所以用 Class.class 作为参数一定可以 因为所有类类型都是 Class.class 的子类
+      try {
+        // todo 为什么传的参数是 Class.class EnumTypeHandler 和 EnumOrdinalTypeHandler 有构造方法，构造方法的参数类型是 Class
+        // 如果以后需要自己实现 TypeHandler 的时候如果需要构造方法传一个参数也得是 Class.class 。
         Constructor<?> c = typeHandlerClass.getConstructor(Class.class);
         return (TypeHandler<T>) c.newInstance(javaTypeClass);
       } catch (NoSuchMethodException ignored) {
@@ -313,6 +331,10 @@ public final class TypeHandlerRegistry {
 
   // scan
 
+  /**
+   * 扫描某个包下的所有 TypeHandler 的子类
+   * @param packageName
+     */
   public void register(String packageName) {
     ResolverUtil<Class<?>> resolverUtil = new ResolverUtil<Class<?>>();
     resolverUtil.find(new ResolverUtil.IsA(TypeHandler.class), packageName);

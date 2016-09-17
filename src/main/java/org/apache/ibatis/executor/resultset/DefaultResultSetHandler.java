@@ -1003,8 +1003,6 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   private CacheKey createRowKey(ResultMap resultMap, ResultSetWrapper rsw, String columnPrefix) throws SQLException {
     final CacheKey cacheKey = new CacheKey();
     cacheKey.update(resultMap.getId());
-
-    ddddd
     List<ResultMapping> resultMappings = getResultMappingsForRowKey(resultMap);
     if (resultMappings.size() == 0) {
       if (Map.class.isAssignableFrom(resultMap.getType())) {
@@ -1042,6 +1040,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     List<ResultMapping> resultMappings = resultMap.getIdResultMappings();
     if (resultMappings.size() == 0) { // todo 应该走不到这儿，在 build resultMap 的时候如果没有 id ，就会把所有的 resultMapping 添加到 idResultMappings
       // 如果没有 id 的话则需要每个 PropertyResultMapping
+      // 有可能为空，如果所有的字段映射都是通过构造方法设置的话
       resultMappings = resultMap.getPropertyResultMappings();
     }
     return resultMappings;
@@ -1079,13 +1078,24 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     }
   }
 
+  /**
+   * todo 如果一个 resultMap 中的 idResultMappings 和 propertyResultMappings 为空的话会利用 unmappedPropertyMappings 创建缓存 key ，
+   * todo idResultMapping 和 propertyResultMappings 都为空的话，那么 constructorResultMappings 应该不会空，那么为什么不用 constructorResultMappings 创建缓存 key 。
+   * @param resultMap
+   * @param rsw
+   * @param cacheKey
+   * @param columnPrefix
+   * @throws SQLException
+     */
   private void createRowKeyForUnmappedProperties(ResultMap resultMap, ResultSetWrapper rsw, CacheKey cacheKey, String columnPrefix) throws SQLException {
     final MetaClass metaType = MetaClass.forClass(resultMap.getType(), reflectorFactory);
+    // 代码阅读到这儿了 todo
     List<String> unmappedColumnNames = rsw.getUnmappedColumnNames(resultMap, columnPrefix);
     for (String column : unmappedColumnNames) {
       String property = column;
       if (columnPrefix != null && !columnPrefix.isEmpty()) {
         // When columnPrefix is specified, ignore columns without the prefix.
+        // columnPrefix 与 resultMap 有关，一个结果集中可能有多个 resultMap ，所以 unmappedColumnNames 中会有些列可能没有前缀
         if (column.toUpperCase(Locale.ENGLISH).startsWith(columnPrefix)) {
           property = column.substring(columnPrefix.length());
         } else {
