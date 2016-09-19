@@ -352,7 +352,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         foundValues = applyAutomaticMappings(rsw, resultMap, metaObject, null) || foundValues;
       }
       // 给属性映射设置值 其中 属性映射 构造方法映射 自动映射这三者没有交集
-      // todo 属性映射和自动映射的顺序能不能交换???
+      // todo 属性映射和自动映射的顺序能不能交换??? 可以的，这两者是没有交集的
       foundValues = applyPropertyMappings(rsw, resultMap, metaObject, lazyLoader, null) || foundValues;
       foundValues = lazyLoader.size() > 0 || foundValues;
       resultObject = foundValues ? resultObject : null;
@@ -361,6 +361,17 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     return resultObject;
   }
 
+  /**
+   * 什么是自动映射？就是从结果集中查询出来的列值，在没有做 <result></result> 映射下也会把相应的列值设置到对象的相应属性中。
+   * 如果在 resultMap 中配置了自动映射，则按配置的值判断
+   * 如果没配置的话，如果是简单 resultMap 只要全局配置不是 NONE （不进行自动映射） 就会自动映射
+   * 如果是嵌套 resultMap 的话只有全局配置是 FULL(全部进行自动映射) 才会自动映射
+   * 自动映射行为有三种值：1、NONE（不进行自动映射） 2、PARTIAL（部分自动映射，即简单的 resultMap 会进行自动映射，嵌套的 resultMap 不会进行自动映射）
+   * 比如在嵌套的 resultMap 中很可能会有重名的属性（列名）比如最容易重名的就是 id
+   * @param resultMap
+   * @param isNested
+   * @return
+     */
   private boolean shouldApplyAutomaticMappings(ResultMap resultMap, boolean isNested) {
     if (resultMap.getAutoMapping() != null) {
       return resultMap.getAutoMapping();
@@ -379,7 +390,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
   private boolean applyPropertyMappings(ResultSetWrapper rsw, ResultMap resultMap, MetaObject metaObject, ResultLoaderMap lazyLoader, String columnPrefix)
       throws SQLException {
-    final List<String> mappedColumnNames = rsw.getMappedColumnNames(resultMap, columnPrefix); // todo 什么时候 mappedColumnNames 不为空？？？
+    final List<String> mappedColumnNames = rsw.getMappedColumnNames(resultMap, columnPrefix); // todo 什么时候 mappedColumnNames 不为空？？？ 在?<resultMap/> 中有<result/>映射的时候不为空
     boolean foundValues = false;
     final List<ResultMapping> propertyMappings = resultMap.getPropertyResultMappings();
     for (ResultMapping propertyMapping : propertyMappings) {
@@ -408,9 +419,9 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     }
     return foundValues;
   }
-
+ ddd 阅读到此处
   /**
-   * 根据属性名称获取到相应的值
+   * todo 根据属性名称获取到相应的值 有三种情况：1、该属性映射关联了一个嵌套查询语句，通过嵌套查询语句查询出该属性的值 2、该属性映射关联了一个结果集 3、属性类型是原生类型，属性值直接通过 resultSet 获取     嵌套 resultMap 该怎么处理呢？？？？？？？
    * @param rs
    * @param metaResultObject
    * @param propertyMapping
@@ -436,17 +447,16 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     }
   }
 
-  // todo 给对象设置所有的属性值 没有映射过的列名设置属性值
+  // todo 从未映射列集合中取出所有的列，看该列是不是 resultMap 对应的 Java 类型中的属性，如果是的话，设置相应的值
   private boolean applyAutomaticMappings(ResultSetWrapper rsw, ResultMap resultMap, MetaObject metaObject, String columnPrefix) throws SQLException {
     final List<String> unmappedColumnNames = rsw.getUnmappedColumnNames(resultMap, columnPrefix);
     boolean foundValues = false;
-    dd 阅读到这儿了
     // todo 什么时候 unmappedColumnNames 不为空？？？？
     for (String columnName : unmappedColumnNames) {
       String propertyName = columnName;
       if (columnPrefix != null && !columnPrefix.isEmpty()) {
         // When columnPrefix is specified,
-        // ignore columns without the prefix.
+        // ignore columns without the prefix. // 因为未映射的列有些并不是这个 resultMap 对应的 Java 类型的属性，这些列名当然不会以 columnPrefix 开头
         if (columnName.toUpperCase(Locale.ENGLISH).startsWith(columnPrefix)) {
           propertyName = columnName.substring(columnPrefix.length());
         } else {
@@ -459,7 +469,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         if (typeHandlerRegistry.hasTypeHandler(propertyType)) {
           final TypeHandler<?> typeHandler = rsw.getTypeHandler(propertyType, columnName);
           final Object value = typeHandler.getResult(rsw.getResultSet(), columnName);
-          // issue #377, call setter on nulls
+          // issue #377, call setter on nulls 结果集中的值（也就是 value ）为 null 的时候是否调用映射对象的 setter 方法见 http://www.mybatis.org/mybatis-3/zh/configuration.html callSettersOnNulls 属性
           if (value != null || configuration.isCallSettersOnNulls()) {
             if (value != null || !propertyType.isPrimitive()) {
               // todo 设置对象的一个属性值
