@@ -30,6 +30,11 @@ public class Address implements Serializable {
     public Address() {
     }
 
+    public Address(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public Address(int id) {
         this.id = id;
     }
@@ -38,7 +43,7 @@ public class Address implements Serializable {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

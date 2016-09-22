@@ -1,0 +1,15 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="shfq.constructor.xml.Address">
+    <resultMap id="addressResultMap" type="shfq.nested_result_map.vo.Address">
+        <constructor>
+            <idArg column="id" javaType="int"/>
+            <arg column="name" javaType="String"></arg>
+        </constructor>
+        <result property="postCode" column="post_code"></result>
+    </resultMap>
+    <select id="selectAddress" parameterType="int" resultMap="addressResultMap">
+        SELECT * FROM address where id=#{id}
+    </select>
+</mapper>
