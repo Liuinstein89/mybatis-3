@@ -67,7 +67,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
   // multiple resultsets
   private final Map<String, ResultMapping> nextResultMaps = new HashMap<String, ResultMapping>();
-  private final Map<CacheKey, List<PendingRelation>> pendingRelations = new HashMap<CacheKey, List<PendingRelation>>(); // todo 一个 cacheKey 其实代表了一个 result 对象，同一个 result 对象可能需要多次链接到父对象上，比如 A 有属性 B1 和 B2，其中属性 B1 和 B2 是同一个对象
+  private final Map<CacheKey, List<PendingRelation>> pendingRelations = new HashMap<CacheKey, List<PendingRelation>>(); // todo 有问题  见 addPendingChildRelation() 方法的 throw new ExecutorException("Two different properties are mapped to the same resultSet"); 一个 cacheKey 其实代表了一个 result 对象，同一个 result 对象可能需要多次链接到父对象上，比如 A 有属性 B1 和 B2，其中属性 B1 和 B2 是同一个对象
 
   private static class PendingRelation {
     public MetaObject metaObject;
@@ -131,7 +131,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   public List<Object> handleResultSets(Statement stmt) throws SQLException {
     ErrorContext.instance().activity("handling results").object(mappedStatement.getId());
 
-    // todo 返回值
+    // todo 返回值 会保存 resultMap 中的返回值但并不是保存每个 resultMap 中的返回值，但原因不知道
     final List<Object> multipleResults = new ArrayList<Object>();
 
     int resultSetCount = 0;
@@ -158,7 +158,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         if (parentMapping != null) {
           String nestedResultMapId = parentMapping.getNestedResultMapId();
           ResultMap resultMap = configuration.getResultMap(nestedResultMapId);
-          handleResultSet(rsw, resultMap, null, parentMapping);
+          handleResultSet(rsw, resultMap, null, parentMapping); // todo 为什么 multipleResults 在上面的 while 循环中出现了，而在此处却传了一个 null
         }
         rsw = getNextResultSet(stmt);
         cleanUpAfterHandlingResultSet();
@@ -229,14 +229,14 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     try {
       // todo 什么时候会有 parentMapping ???? 存储过程有多个结果集的时候会有
       if (parentMapping != null) {
-        handleRowValues(rsw, resultMap, null, RowBounds.DEFAULT, parentMapping);
+        handleRowValues(rsw, resultMap, null, RowBounds.DEFAULT, parentMapping); // todo 这儿并没有 multipleResults.add()； 这一行代码，这是为什么呢
       } else {
-        // todo 什么时候 resultHandler 为 null？为什么 resultHandler 为 null 的时候 需要 multipleResults.add
+        // todo 什么时候 resultHandler 不为 null？应该是在 xml sql 中配置了 resultHandler 为什么 resultHandler 为 null 的时候 需要 multipleResults.add
         // 而resultHandler 不为 null 的时候 却不需要？？？
         if (resultHandler == null) {
           DefaultResultHandler defaultResultHandler = new DefaultResultHandler(objectFactory);
           // todo 处理返回的一个结果集，一个结果集中可能有多条记录
-          handleRowValues(rsw, resultMap, defaultResultHandler, rowBounds, null);
+          handleRowValues(rsw, resultMap, defaultResultHandler, rowBounds, null); // resultHandler 和 parentMapping 不会同时出现
           multipleResults.add(defaultResultHandler.getResultList());
         } else {
           handleRowValues(rsw, resultMap, resultHandler, rowBounds, null); // todo 为什么有了 resultHandler 之后就不需要 multipleResults.add(defaultResultHandler.getResultList()); bug?还是故意的？？
@@ -282,7 +282,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     }
   }
 
-  // todo 处理简单 resultMap 只含有一个简单对象
+  // todo 处理简单 resultMap 只含有一个简单对象 也不一定，有可能是存储过程中一个结果集里的对象还有一个子对象在另外一个结果集中
   private void handleRowValuesForSimpleResultMap(ResultSetWrapper rsw, ResultMap resultMap, ResultHandler<?> resultHandler, RowBounds rowBounds, ResultMapping parentMapping)
       throws SQLException {
     DefaultResultContext<Object> resultContext = new DefaultResultContext<Object>();
@@ -339,7 +339,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   // GET VALUE FROM ROW FOR SIMPLE RESULT MAP
   //
 
-  // todo 处理一个结果集中的一行数据 把一行数据映射为一个对象
+  // todo 处理一个结果集中的一行数据 把一行数据映射为一个对象 简单 resultMap
   private Object getRowValue(ResultSetWrapper rsw, ResultMap resultMap) throws SQLException {
     final ResultLoaderMap lazyLoader = new ResultLoaderMap();
     // todo 创建好的返回的对象
@@ -396,13 +396,13 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     for (ResultMapping propertyMapping : propertyMappings) {
       String column = prependPrefix(propertyMapping.getColumn(), columnPrefix);
       if (propertyMapping.getNestedResultMapId() != null) {
-        // todo 为什么要忽略？？？？ 什么时候可以忽略
+        // todo 为什么要忽略？？？？ 什么时候可以忽略 有嵌套 resultMapp 的时候应该怎么处理
         // the user added a column attribute to a nested result map, ignore it
         column = null;
       }
       if (propertyMapping.isCompositeResult()
-          || (column != null && mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH)))
-          || propertyMapping.getResultSet() != null) { // todo mappedColumnNames 是干啥的？？？ 为啥 mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH))
+          || (column != null && mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH))) // todo mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH)) 有没有
+          || propertyMapping.getResultSet() != null) { // todo mappedColumnNames 是干啥的？？？ 为啥需要 mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH)) ？？？ 感觉是不需要的，因为 mappedColumnNames+unmappedColumnNames=fullNames(从结果集中查询出来的所有的列名集合) mappedColumnNames 是从 fullNames 集合中遍历并且该列名在 resultMappings（也包括组合列名） 中出现过才会加入
         Object value = getPropertyMappingValue(rsw.getResultSet(), metaObject, propertyMapping, lazyLoader, columnPrefix);
         // issue #541 make property optional
         final String property = propertyMapping.getProperty();
@@ -419,7 +419,6 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     }
     return foundValues;
   }
- ddd 阅读到此处
   /**
    * todo 根据属性名称获取到相应的值 有三种情况：1、该属性映射关联了一个嵌套查询语句，通过嵌套查询语句查询出该属性的值 2、该属性映射关联了一个结果集 3、属性类型是原生类型，属性值直接通过 resultSet 获取     嵌套 resultMap 该怎么处理呢？？？？？？？
    * @param rs
@@ -529,7 +528,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   /**
    * 为 multiple result（只有存储过程才可能有多个结果集） 创建缓存 key
    * 缓存 key 与 resultMapping 有关系，属性名称以及该属性名称相应的值。
-   * 其实是相当于给 result 对象创建了 cacheKey 。如果 names 是 id 的话，如果不是则表示的应该是所有的属性，所有的属性都一样，才表示对象相同
+   * todo 其实是相当于给 result 对象创建了 cacheKey 。如果 names 是 id 的话，???????????如果不是则表示的应该是所有的属性，所有的属性都一样，才表示对象相同
    * @param rs
    * @param resultMapping
    * @param names
@@ -871,7 +870,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       final CacheKey rowKey = createRowKey(discriminatedResultMap, rsw, null);
       Object partialObject = nestedResultObjects.get(rowKey);
       // issue #577 && #542
-      if (mappedStatement.isResultOrdered()) {
+      if (mappedStatement.isResultOrdered()) { // todo 什么时候会是有序的？？？有序是怎么实现的？？？？
         if (partialObject == null && rowValue != null) {
           nestedResultObjects.clear();
           storeObject(resultHandler, resultContext, rowValue, parentMapping, rsw.getResultSet());
@@ -890,12 +889,12 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   }
 
   //
-  // GET VALUE FROM ROW FOR NESTED RESULT MAP
+  // GET VALUE FROM ROW FOR NESTED RESULT MAP todo 有几个重载的 getRowValue(); 为什么设计成这样？？
   //
 
   private Object getRowValue(ResultSetWrapper rsw, ResultMap resultMap, CacheKey combinedKey, CacheKey absoluteKey, String columnPrefix, Object partialObject) throws SQLException {
     final String resultMapId = resultMap.getId();
-    Object resultObject = partialObject;
+    Object resultObject = partialObject; // todo 什么时候 partialObject 不为空？？？
     if (resultObject != null) {
       final MetaObject metaObject = configuration.newMetaObject(resultObject);
       putAncestor(absoluteKey, resultObject, resultMapId, columnPrefix);
@@ -904,16 +903,16 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     } else {
       final ResultLoaderMap lazyLoader = new ResultLoaderMap();
       resultObject = createResultObject(rsw, resultMap, lazyLoader, columnPrefix);
-      if (resultObject != null && !typeHandlerRegistry.hasTypeHandler(resultMap.getType())) {
+      if (resultObject != null && !typeHandlerRegistry.hasTypeHandler(resultMap.getType())) { // typeHandlerRegistry.hasTypeHandler(resultMap.getType()) 嵌套对象是个简单类型
         final MetaObject metaObject = configuration.newMetaObject(resultObject);
         boolean foundValues = !resultMap.getConstructorResultMappings().isEmpty();
-        if (shouldApplyAutomaticMappings(resultMap, true)) {
+        if (shouldApplyAutomaticMappings(resultMap, true)) { // 如果是嵌套 resultMap 传 true ，否则传 false
           foundValues = applyAutomaticMappings(rsw, resultMap, metaObject, columnPrefix) || foundValues;
         }
         foundValues = applyPropertyMappings(rsw, resultMap, metaObject, lazyLoader, columnPrefix) || foundValues;
         putAncestor(absoluteKey, resultObject, resultMapId, columnPrefix);
         foundValues = applyNestedResultMappings(rsw, resultMap, metaObject, columnPrefix, combinedKey, true) || foundValues;
-        ancestorObjects.remove(absoluteKey);
+        ancestorObjects.remove(absoluteKey); // todo 为什么要移除呢？？？
         foundValues = lazyLoader.size() > 0 || foundValues;
         resultObject = foundValues ? resultObject : null;
       }
@@ -924,7 +923,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     return resultObject;
   }
 
-  private void putAncestor(CacheKey rowKey, Object resultObject, String resultMapId, String columnPrefix) {
+  private void putAncestor(CacheKey rowKey, Object resultObject, String resultMapId, String columnPrefix) { // todo 这是干什么的
     if (!ancestorColumnPrefix.containsKey(resultMapId)) {
       ancestorColumnPrefix.put(resultMapId, columnPrefix);
     }
@@ -932,7 +931,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   }
 
   //
-  // NESTED RESULT MAP (JOIN MAPPING)
+  // NESTED RESULT MAP (JOIN MAPPING) todo
   //
 
   private boolean applyNestedResultMappings(ResultSetWrapper rsw, ResultMap resultMap, MetaObject metaObject, String parentPrefix, CacheKey parentRowKey, boolean newObject) {

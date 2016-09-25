@@ -263,7 +263,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     List<ResultMapping> resultMappings = new ArrayList<ResultMapping>();
     resultMappings.addAll(additionalResultMappings);
     List<XNode> resultChildren = resultMapNode.getChildren();
-    // todo 解析一个 <result> 或 <association>
+    // todo 解析一个 <result> 或 <association> <collection/> <discriminator/> <id/> <constructor/>
     for (XNode resultChild : resultChildren) {
       if ("constructor".equals(resultChild.getName())) {
         processConstructorElement(resultChild, typeClass, resultMappings);
@@ -291,11 +291,11 @@ public class XMLMapperBuilder extends BaseBuilder {
 
   private void processConstructorElement(XNode resultChild, Class<?> resultType, List<ResultMapping> resultMappings) throws Exception {
     List<XNode> argChildren = resultChild.getChildren();
-    // idArg 或 arg
+    // idArg 或 arg <constructor/> 没有任何属性 只有子元素 idArg 或 Arg
     // 构造方法的参数必须要按照顺序传 比如一个构造方法有三个参数都是 String 类型，因为没有办法获取到参数名称，只能根据顺序传递
     // 所以构造方法中的子元素 idArg 和 arg 元素都没有 property 属性
     // todo notNullColumn ???????
-    // columnPrefix
+    // columnPrefix <idArg/> 或者是 <arg/> 有 6 个属性分别是 javaType、column、jdbcType、typeHandler、select、resultMap 见 mybatis-3-mapper.dtd idArg/arg 定义
     // foreignColumn
     // resultSet
     // fetchType
@@ -370,7 +370,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     return true;
   }
 
-  // 处理 <association/> <collection/> <id/> <result/> 的映射
+  // 处理 <association/> <collection/> <id/> <result/> <arg/> <idArg/> 的映射
   private ResultMapping buildResultMappingFromContext(XNode context, Class<?> resultType, List<ResultFlag> flags) throws Exception {
     String property = context.getStringAttribute("property");
     String column = context.getStringAttribute("column");
@@ -384,7 +384,7 @@ public class XMLMapperBuilder extends BaseBuilder {
 
     // 处理嵌套 resultMap nestedResultMap 是嵌套结果集的 id
     String nestedResultMap = context.getStringAttribute("resultMap",
-        processNestedResultMappings(context, Collections.<ResultMapping> emptyList()));
+        processNestedResultMappings(context, Collections.<ResultMapping> emptyList())); // 为什么要传一个 Collections.<ResultMapping> emptyList()) 空的 list 呢？？？
 
     String notNullColumn = context.getStringAttribute("notNullColumn");
     String columnPrefix = context.getStringAttribute("columnPrefix");
