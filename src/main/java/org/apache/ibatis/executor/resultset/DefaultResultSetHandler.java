@@ -401,7 +401,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         column = null;
       }
       if (propertyMapping.isCompositeResult()
-          || (column != null && mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH))) // todo mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH)) 有没有
+          || (column != null && mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH))) // todo mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH)) 有没有 有用，因为在 嵌套查询中的列名虽然不为空，但也不会在 mappedColumnNames.contains 中包括
           || propertyMapping.getResultSet() != null) { // todo mappedColumnNames 是干啥的？？？ 为啥需要 mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH)) ？？？ 感觉是不需要的，因为 mappedColumnNames+unmappedColumnNames=fullNames(从结果集中查询出来的所有的列名集合) mappedColumnNames 是从 fullNames 集合中遍历并且该列名在 resultMappings（也包括组合列名） 中出现过才会加入
         Object value = getPropertyMappingValue(rsw.getResultSet(), metaObject, propertyMapping, lazyLoader, columnPrefix);
         // issue #541 make property optional
@@ -912,6 +912,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         foundValues = applyPropertyMappings(rsw, resultMap, metaObject, lazyLoader, columnPrefix) || foundValues;
         putAncestor(absoluteKey, resultObject, resultMapId, columnPrefix);
         foundValues = applyNestedResultMappings(rsw, resultMap, metaObject, columnPrefix, combinedKey, true) || foundValues;
+        dd
         ancestorObjects.remove(absoluteKey); // todo 为什么要移除呢？？？
         foundValues = lazyLoader.size() > 0 || foundValues;
         resultObject = foundValues ? resultObject : null;
@@ -923,7 +924,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     return resultObject;
   }
 
-  private void putAncestor(CacheKey rowKey, Object resultObject, String resultMapId, String columnPrefix) { // todo 这是干什么的
+  private void putAncestor(CacheKey rowKey, Object resultObject, String resultMapId, String columnPrefix) { // todo 这是干什么的 好像只会在嵌套 resultMap 中使用
     if (!ancestorColumnPrefix.containsKey(resultMapId)) {
       ancestorColumnPrefix.put(resultMapId, columnPrefix);
     }

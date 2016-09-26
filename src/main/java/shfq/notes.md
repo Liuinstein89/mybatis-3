@@ -42,7 +42,7 @@ Configuration.checkLocallyForDiscriminatedNestedResultMaps();
 
 -- resultMap <resultMap/> <collection/> <association/> <case/> 本质上都是 resultMap 
 -- 嵌套 resultMap ：就是在同一个结果集中，一个 resultMap 中的一个 <result> 中又确定了一个结果集。在 resultMapping 元素中有 resultMap 属性或者是 <collection/> <association/> 元素。但要注意 <collection/> 和 <association/> 是有前提条件的，条件就是这两个元素不能有 select 属性，因为
--- 简单 resultMap 中的 resultMapping 中也有可能有 nestedResultMapId 
+-- 简单 resultMap 中的 resultMapping 中也有可能有 nestedResultMapId 对吗？？？
 -- 懒加载和嵌套查询时是同时出现的。、
 -- 属性映射有三种：1.构造方法 2.自动映射 3.set 方法 。不知道在构造方法中能不能映射复合类型。
 -- 自动映射都是简单类型的映射，为什么呢？因为自动映射是在 <resultMap> 中没有加的映射而是直接从结果集中筛选出非映射的列，然后通过反射查看返回类型有没有与列名相对应的属性，从数据库结果集中返回的列肯定都是简单类型。

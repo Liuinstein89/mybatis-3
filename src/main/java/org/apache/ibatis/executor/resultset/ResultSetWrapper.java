@@ -46,13 +46,13 @@ class ResultSetWrapper {
   // 假设 Map<String, List<String>> 中的 值一个 list 是 mappedColumnNames，则 mappedColumnNames + unMappedColumnNames = columnNames
   //  其中 mappedColumnNames 是根据 resultMap 中的 mappedColumns 来决定的 mappedColumnNames 的每一个值一定是某一个 resultMap 所映射的列名，但
   // unMappedColumnNames 却不一定是，它里面可能包含了其他 resultMap 映射的所有的列。
-  // mappedColumnNames
+  // mappedColumnNames 是 ResultMap 类中 mappedColumns 集合和 columnNames 集合的交集
   // 为什么要设计成这样的结构呢，即 Map 里的值是 List 因为一个结果集里可能需要映射多个 ResultMap 一个 ResultMap 需要对应一个 List
   // 键是 resultMap + : + columnPrefix 组成 某个 resultMap 中需要映射的所有列
   private Map<String, List<String>> mappedColumnNamesMap = new HashMap<String, List<String>>();
   // 为什么要设计成这样的结构呢，即 Map 里的值是 List 因为一个结果集里可能需要映射多个 ResultMap 一个 ResultMap 需要对应一个 List
   // 某个 resultMap 中不需要映射的列，即 columnNames - mappedColumnNames(某个 resultMap 中 mappedCoulumnNames)
-  private Map<String, List<String>> unMappedColumnNamesMap = new HashMap<String, List<String>>();
+  private Map<String, List<String>> unMappedColumnNamesMap = new HashMap<String, List<String>>();//
 
   public ResultSetWrapper(ResultSet rs, Configuration configuration) throws SQLException {
     super();

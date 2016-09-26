@@ -36,14 +36,14 @@ public class ResultMap {
   // 在 mapper 中 @ConstructorArgs 中出现的都属于 constructorResultMappings
   // 同一个 ResultMapping 不会同时出现在 constructorResultMappings 和 propertyResultMappings 两个 list 中
   // 为什么不会同时出现呢？constructorResultMappings 会在创建构造方法的时候设置属性值，如果在构造方法中出现过的当然不需要再次重新设置属性值 constructorResultMappings + propertyResultMappings = resultMapping
-  private List<ResultMapping> constructorResultMappings;
+  private List<ResultMapping> constructorResultMappings; // constructorResultMappings + propertyResultMappings = resultMappings
   // 属性 resultMapping 可能会空，如果所有的映射都是通过构造方法进行的话
   private List<ResultMapping> propertyResultMappings;
-  // todo 需要映射的列集合，比如一个 select * 可能查询出好多列，但我只想映射其中的两列，多余的可以不映射。
+  // todo 需要映射的列集合，比如一个 select * 可能查询出好多列，但我只想映射其中的两列，多余的可以不映射。 解析出的 resultMapping 中的 column 不为空的话都会把 column 的值加入到集合中，如果 column 为空的话同时组合列集合不为空的话则把每一个组合列的列名也加入到集合中。
   private Set<String> mappedColumns;
   private Discriminator discriminator;
   private boolean hasNestedResultMaps; // todo resultMap 里是否有嵌套 resultMap ，如果一个 resultMap 里的任一个 resultMapping 里有 resultMap 并且 resultSet 为空的话 好像还有其他的特殊情况，会调用 forceNestedResultMaps() 方法 就算有嵌套映射 为什么还需要有 resultSet 为空的条件，可能是 resultMap 和它的嵌套 resultMap 映射的是同一个结果集中的数据。有了 resultSet 后 resultMap 和它的 resultMap 是从不同的结果集中抽取数据。
-  // todo 有没有嵌套查询 例如在 mapper 中有 annotation @One @Many 就是嵌套查询???? resultMap 里 只要有一个 resultMapping 有嵌套查询则该 resultMap 是有嵌套查询的
+  // todo resultMap 里 只要有一个 resultMapping 有嵌套查询则该 resultMap 是有嵌套查询的
   private boolean hasNestedQueries;
   private Boolean autoMapping;
 
@@ -77,7 +77,6 @@ public class ResultMap {
       if (resultMap.id == null) {
         throw new IllegalArgumentException("ResultMaps must have an id");
       }
-      dd
       resultMap.mappedColumns = new HashSet<String>();
       resultMap.idResultMappings = new ArrayList<ResultMapping>();
       resultMap.constructorResultMappings = new ArrayList<ResultMapping>();
