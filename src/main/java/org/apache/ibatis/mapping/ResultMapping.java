@@ -39,7 +39,7 @@ public class ResultMapping {
   private Class<?> javaType;
   private JdbcType jdbcType;
   private TypeHandler<?> typeHandler;
-  // 嵌套结果集 id ，一般是在 association 或 collection 对应的结果集的 id
+  // 嵌套结果集 id ，如果有 resultMap 属性的话，则是 resultMap 属性的值，否则则可能是是在 association 或 collection 或 case 对应的结果集的 id
   private String nestedResultMapId;
   // 嵌套查询 id ，一般是在 association 或 collection 或 <constructor><arg select=""></arg></constructor> 对应的 select 的 id
   private String nestedQueryId;
