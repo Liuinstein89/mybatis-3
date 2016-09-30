@@ -912,7 +912,6 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         foundValues = applyPropertyMappings(rsw, resultMap, metaObject, lazyLoader, columnPrefix) || foundValues;
         putAncestor(absoluteKey, resultObject, resultMapId, columnPrefix);
         foundValues = applyNestedResultMappings(rsw, resultMap, metaObject, columnPrefix, combinedKey, true) || foundValues;
-        dd
         ancestorObjects.remove(absoluteKey); // todo 为什么要移除呢？？？
         foundValues = lazyLoader.size() > 0 || foundValues;
         resultObject = foundValues ? resultObject : null;
@@ -945,7 +944,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
           final ResultMap nestedResultMap = getNestedResultMap(rsw.getResultSet(), nestedResultMapId, columnPrefix);
           CacheKey rowKey = null;
           Object ancestorObject = null;
-          if (ancestorColumnPrefix.containsKey(nestedResultMapId)) {
+          if (ancestorColumnPrefix.containsKey(nestedResultMapId)) { // todo 什么时候会 containsKey 呢？？？
             rowKey = createRowKey(nestedResultMap, rsw, ancestorColumnPrefix.get(nestedResultMapId));
             ancestorObject = ancestorObjects.get(rowKey);
           }
@@ -955,10 +954,10 @@ public class DefaultResultSetHandler implements ResultSetHandler {
             }
           } else {
             rowKey = createRowKey(nestedResultMap, rsw, columnPrefix);
-            final CacheKey combinedKey = combineKeys(rowKey, parentRowKey);
+            final CacheKey combinedKey = combineKeys(rowKey, parentRowKey); // todo 为什么要把两者的 key 结合起来呢？？？
             Object rowValue = nestedResultObjects.get(combinedKey);
             boolean knownValue = (rowValue != null);
-            instantiateCollectionPropertyIfAppropriate(resultMapping, metaObject); // mandatory            
+            instantiateCollectionPropertyIfAppropriate(resultMapping, metaObject); // mandatory  todo 作用
             if (anyNotNullColumnHasValue(resultMapping, columnPrefix, rsw.getResultSet())) {
               rowValue = getRowValue(rsw, nestedResultMap, combinedKey, rowKey, columnPrefix, rowValue);
               if (rowValue != null && !knownValue) {
