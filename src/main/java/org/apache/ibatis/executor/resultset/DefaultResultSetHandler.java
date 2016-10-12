@@ -61,9 +61,9 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   private final ReflectorFactory reflectorFactory;
 
   // nested resultmaps
-  private final Map<CacheKey, Object> nestedResultObjects = new HashMap<CacheKey, Object>();
-  private final Map<CacheKey, Object> ancestorObjects = new HashMap<CacheKey, Object>(); // todo 祖先对象缓存集合 主要用于 a 中有个 b 同时 b 中又有个 a 在获取 b 对象的时候 a 对象会保存在祖先缓存对象集合中，并把取出的对象链接到 b 中。祖先对象在使用完后会移除，例如 a 中有 b 而 b 中 又有 c ，则 a b c 都是祖先对象，当把 c 对象获取到之后会移除缓存中的 c ，当把 b 对象获取完之后会移除 b ，当把 a 对象获取完之后也会移除 a
-  private final Map<String, String> ancestorColumnPrefix = new HashMap<String, String>(); // todo 祖先列前缀集合，键为 resultMapId 值为列前缀 作用主要是判断父对象是不是在缓存中
+  private final Map<CacheKey, Object> nestedResultObjects = new HashMap<CacheKey, Object>(); // todo 只有一个对象的所有子属性完全获取到之后才会把这个对象缓存到 nestedResultObjects 集合中。嵌套结果对象集合一般用在多表关联查询类似 people-》pets 中，迭代结果集的第二行数据时 people 对象会从嵌套结果对象结果集中取出，而不用再像第一次那样来获取了，提高了效率。
+  private final Map<CacheKey, Object> ancestorObjects = new HashMap<CacheKey, Object>(); // todo 祖先对象缓存集合 主要用于 a 中有个 b 同时 b 中又有个 a 在获取 b 对象的时候 a 对象会保存在祖先缓存对象集合中，并把取出的对象链接到 b 中。祖先对象在使用完后会移除，例如 a 中有 b 而 b 中 又有 c ，则 a b c 都是祖先对象，当把 c 对象获取到之后会移除缓存中的 c ，当把 b 对象获取完之后会移除 b ，当把 a 对象获取完之后也会移除 a。祖先对象和嵌套对象的层次不一样，祖先对象的层次是在同一层即同一行数据中(数据库结果集的同一行数据)，嵌套对象的层次不一定是在同一行数据中，有可能位于同一行，有可能位于多行（数据库结果集的多行数据）中。祖先对象集合避免了死循环。
+  private final Map<String, String> ancestorColumnPrefix = new HashMap<String, String>(); // todo 祖先列前缀集合，键为 resultMapId 值为列前缀 作用主要是判断父对象是不是在缓存中。在获取完一个 resultMap 中的一个值后会把缓存中的这个值移除。在获取完一个结果集中的一行数据后会清空整个祖先集合，在调用 applyNestedResultMappings(); 方法之前会先把当前对象加入到祖先集合中，在获取该对象的属性的过程中可能会用到祖先对象。
 
   // multiple resultsets
   private final Map<String, ResultMapping> nextResultMaps = new HashMap<String, ResultMapping>();
@@ -904,7 +904,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
    * @param resultMap
    * @param combinedKey
    * @param absoluteKey
-   * @param columnPrefix
+   * @param columnPrefix 关联 resultMap 的前缀见：http://www.mybatis.org/mybatis-3/zh/sqlmap-xml.html ，其对应着 <association/> 或者是 <collection/> 标签中的 columnPrefix 属性。 因为是嵌套 resultMap 的列前缀，所以第一个 resultMap 的 getRowValue(); 方法传的参数是 null 只有其 resultMapping 又关联了另外一个 resultMap 在调用子 resultMap 中的 getRowValue(); 方法时会传子 resultMap 的列前缀。
    * @param partialObject
    * @return
      * @throws SQLException
@@ -915,7 +915,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     if (resultObject != null) {
       final MetaObject metaObject = configuration.newMetaObject(resultObject);
       putAncestor(absoluteKey, resultObject, resultMapId, columnPrefix);
-      applyNestedResultMappings(rsw, resultMap, metaObject, columnPrefix, combinedKey, false);
+      applyNestedResultMappings(rsw, resultMap, metaObject, columnPrefix, combinedKey, false); // 从缓存中取出的对象时最后一个参数传递 false
       ancestorObjects.remove(absoluteKey);
     } else {
       final ResultLoaderMap lazyLoader = new ResultLoaderMap();
@@ -928,11 +928,12 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         }
         foundValues = applyPropertyMappings(rsw, resultMap, metaObject, lazyLoader, columnPrefix) || foundValues;
         putAncestor(absoluteKey, resultObject, resultMapId, columnPrefix); // 在 applyNestedResultMappings(); 之前保存祖先对象，之后再移除，再设置其属性的时候属性里又可能需要到祖先对象，所以属性设置完毕之后移除祖先对象
-        foundValues = applyNestedResultMappings(rsw, resultMap, metaObject, columnPrefix, combinedKey, true) || foundValues;
+        foundValues = applyNestedResultMappings(rsw, resultMap, metaObject, columnPrefix, combinedKey, true) || foundValues; // 对一个对象的复杂属性进行设值，缓存中没有对象，则最后一个参数传 true .
         ancestorObjects.remove(absoluteKey); // todo 为什么要移除呢？？？ 最先对象是为获取其子对象服务的（子对象里可能又有祖先对象，比如 a 中有 b b 中又有 a 此时 b 是子对象，当把 b 中的所有属性都获取到从而 b 的值也就获取到了，所以可以把 b 从祖先对象集合中移除了。在获取 b 的值时用到了祖先对象集合，a 的值是通过从祖先对象集合中获取到的，然后再设置到 b 中，如果不是这样做的话，很有可能会造成死循环）
         foundValues = lazyLoader.size() > 0 || foundValues;
         resultObject = foundValues ? resultObject : null;
       }
+      dd // todo 到底什么时候 combinedKey == CacheKey.NULL_CACHE_KEY
       if (combinedKey != CacheKey.NULL_CACHE_KEY) { // todo 什么时候 combinedKey 是 CacheKey.NULL_CACHE_KEY
         nestedResultObjects.put(combinedKey, resultObject); // todo 这又是干啥的
       }
@@ -948,7 +949,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   }
 
   //
-  // NESTED RESULT MAP (JOIN MAPPING) todo parentRowKey 是指父对象的缓存 key
+  // NESTED RESULT MAP (JOIN MAPPING) todo parentRowKey 是指父对象的缓存 key 设置某个对象的复杂属性 得分析一下多层嵌套对象为什么不会造成死循环 造成死循环是因为嵌套 a 中有 b b 中又有 a 但在 applyNestedResultMappings(); 方法中有嵌套的情况下 ancestorObject 对象就不为空，儿 ancestorObject 不为空的话不会再调用 getRowValue();方法，所以不会造成死循环。
   //
 
   private boolean applyNestedResultMappings(ResultSetWrapper rsw, ResultMap resultMap, MetaObject metaObject, String parentPrefix, CacheKey parentRowKey, boolean newObject) {
@@ -963,10 +964,10 @@ public class DefaultResultSetHandler implements ResultSetHandler {
           Object ancestorObject = null;
           if (ancestorColumnPrefix.containsKey(nestedResultMapId)) { // todo 什么时候会 containsKey 呢？？？
             rowKey = createRowKey(nestedResultMap, rsw, ancestorColumnPrefix.get(nestedResultMapId));
-            ancestorObject = ancestorObjects.get(rowKey); // todo 这儿的 ancestorObject 是不是一定不为 null ，不是的，还有可能是为 null 的
+            ancestorObject = ancestorObjects.get(rowKey); // todo 这儿的 ancestorObject 是不是一定不为 null ，不是的，还有可能是为 null 的。比如在迭代结果集的第二行数据的时候 ancestorColumnPrefix 里一定会有所有 resultMapId 但并不是所有的对象都是当前属性的所属对象的祖先对象。举个具体的例子，比如 People->pets 在获取 people 对象 pets 集合中的第二个 pet 的时候，ancestorColumnPrefix 集合中包含着 resultMapId 但 ancestorObjects 集合中是没有 pet 对象的。只有在调用 applyNestedResultMappings(); 方法获取 pet 对象的属性之前（已经创建好 pet 对象）才会把 pet 对象加入到祖先对象集合中，而此时还没有创建 pet 呢。
           }
           if (ancestorObject != null) {
-            if (newObject) { // todo 为什么新的对象就需要链接旧的就不需要
+            if (newObject) { // todo 为什么新的对象就需要链接旧的就不需要。 // 构造一个 A 里有 People 的类，试试看是什么效果？？？？ // todo 还是不知道在哪种场景下 ancestorObject 对象不为 null 但 newObject 为 false ？？？？ 可能在这种复杂的情况下是存在的：People->pets->Pet->C->People 模式下有两行数据：1、people1->pets->pet1->c1->people1 2、people1->pets->pet2->c1->people1 好像这种情形还是无法满足条件！！！到底能不能满足好像还是不清楚，需要构造数据来验证一下，或者认真分析一下代码？？？
               linkObjects(metaObject, resultMapping, ancestorObject); // issue #385
             }
           } else {
@@ -976,8 +977,8 @@ public class DefaultResultSetHandler implements ResultSetHandler {
             boolean knownValue = (rowValue != null); // rowValue 的作用应该是为了设置 knowValue 的值，因为在下面又对 rowValue 重新赋值了
             instantiateCollectionPropertyIfAppropriate(resultMapping, metaObject); // mandatory  todo 作用 初始化属性的集合类型 例如 A 有属性 list List 则会给 list = new ArrayList();
             if (anyNotNullColumnHasValue(resultMapping, columnPrefix, rsw.getResultSet())) {
-              rowValue = getRowValue(rsw, nestedResultMap, combinedKey, rowKey, columnPrefix, rowValue);// todo rowValue 为什么要重复赋值 如果从缓存中获取到值以后为什么还需要重新调用 getRowValue(); 来获取值？
-              if (rowValue != null && !knownValue) { // todo 什么时候 knowValue 的值为 true ???
+              rowValue = getRowValue(rsw, nestedResultMap, combinedKey, rowKey, columnPrefix, rowValue);// todo rowValue 为什么要重复赋值 如果从缓存中获取到值以后为什么还需要重新调用 getRowValue(); 来获取值？ 这和 handleRowValuesForNestedResultMap(); 方法中 partialObject 不为 null 的时候仍然调用 getRowValue(); 是一样的道理。虽然缓存中已经有了这个对象，但这个对象不是完整的对象。例如，例如 class A 的一个对象 a 和 People 的一个对象 people 是一一对应的，我们知道 people 里又有 pets 集合，在这种情况下虽然 people 对象已经在缓存中存在了但是 people 的 pets 集合里可能只有一个 pet 这个集合里可能有多个 pet 所以 people 虽然在缓存中存在但仍然需要去调用 getRowValue(); 方法来获取 people 中的 pets 中的元素 pet 。
+              if (rowValue != null && !knownValue) { // todo 什么时候 knowValue 的值为 true ???见上一句注释，在 A 中有 People 属性，多表连接的时候已经获取到第一行数据后再次获取 people 的值的时候 people 已经在缓存中存在，所以 knowValue 的值为 true 表示的是已知的对象（缓存中存在的对象）。
                 linkObjects(metaObject, resultMapping, rowValue);
                 foundValues = true;
               }
@@ -1116,7 +1117,6 @@ public class DefaultResultSetHandler implements ResultSetHandler {
      */
   private void createRowKeyForUnmappedProperties(ResultMap resultMap, ResultSetWrapper rsw, CacheKey cacheKey, String columnPrefix) throws SQLException {
     final MetaClass metaType = MetaClass.forClass(resultMap.getType(), reflectorFactory);
-    // 代码阅读到这儿了 todo
     List<String> unmappedColumnNames = rsw.getUnmappedColumnNames(resultMap, columnPrefix);
     for (String column : unmappedColumnNames) {
       String property = column;
