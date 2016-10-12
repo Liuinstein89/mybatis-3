@@ -46,3 +46,7 @@ Configuration.checkLocallyForDiscriminatedNestedResultMaps();
 -- 懒加载和嵌套查询时是同时出现的。、
 -- 属性映射有三种：1.构造方法 2.自动映射 3.set 方法 。不知道在构造方法中能不能映射复合类型。
 -- 自动映射都是简单类型的映射，为什么呢？因为自动映射是在 <resultMap> 中没有加的映射而是直接从结果集中筛选出非映射的列，然后通过反射查看返回类型有没有与列名相对应的属性，从数据库结果集中返回的列肯定都是简单类型。
+
+几个结论：
+
+-- 在有嵌套 resultMap 中的 resultMapping 中的 column 是没有作用的，所以 <collection/> 等中的 column 属性是没有用的。

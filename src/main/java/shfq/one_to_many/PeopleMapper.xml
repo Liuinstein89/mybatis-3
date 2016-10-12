@@ -5,14 +5,14 @@
 
     <resultMap id="peopleResultMap" type="shfq.one_many_annotation.People">
         <id column="people_id" property="id"></id>
-        <result column="name" property="name"></result>
-        <collection column="pet_id" property="pets" ofType="shfq.one_many_annotation.Pet">
+        <result column="people_name" property="name"></result>
+        <collection property="pets" ofType="shfq.one_many_annotation.Pet">
             <id column="pet_id" property="id"></id>
-            <result column="name" property="name"></result>
-            <association property="owner" column="owner_id" resultMap="peopleResultMap"></association>
+            <result column="pet_name" property="name"></result>
+            <association property="owner" resultMap="peopleResultMap"></association>
         </collection>
     </resultMap>
     <select id="selectPeople" parameterType="int" resultMap="peopleResultMap">
-        SELECT people.id as people_id, people.name, pet.id as pet_id, pet.name, pet.owner_id FROM people people, pet pet WHERE people.id=#{id} AND pet.owner_id=people.id
+        SELECT people.id as people_id, people.name as people_name, pet.id as pet_id, pet.name as pet_name, pet.owner_id FROM people people, pet pet WHERE people.id=#{id} AND pet.owner_id=people.id
     </select>
 </mapper>

@@ -62,8 +62,8 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
   // nested resultmaps
   private final Map<CacheKey, Object> nestedResultObjects = new HashMap<CacheKey, Object>();
-  private final Map<CacheKey, Object> ancestorObjects = new HashMap<CacheKey, Object>();
-  private final Map<String, String> ancestorColumnPrefix = new HashMap<String, String>();
+  private final Map<CacheKey, Object> ancestorObjects = new HashMap<CacheKey, Object>(); // todo 祖先对象缓存集合 主要用于 a 中有个 b 同时 b 中又有个 a 在获取 b 对象的时候 a 对象会保存在祖先缓存对象集合中，并把取出的对象链接到 b 中。祖先对象在使用完后会移除，例如 a 中有 b 而 b 中 又有 c ，则 a b c 都是祖先对象，当把 c 对象获取到之后会移除缓存中的 c ，当把 b 对象获取完之后会移除 b ，当把 a 对象获取完之后也会移除 a
+  private final Map<String, String> ancestorColumnPrefix = new HashMap<String, String>(); // todo 祖先列前缀集合，键为 resultMapId 值为列前缀 作用主要是判断父对象是不是在缓存中
 
   // multiple resultsets
   private final Map<String, ResultMapping> nextResultMaps = new HashMap<String, ResultMapping>();
@@ -256,7 +256,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   //
   // HANDLE ROWS FOR SIMPLE RESULTMAP
   //
-  // todo 处理一个结果集中的所有记录
+  // todo 处理一个结果集中的某个 resultMap 中的所有记录
   private void handleRowValues(ResultSetWrapper rsw, ResultMap resultMap, ResultHandler<?> resultHandler, RowBounds rowBounds, ResultMapping parentMapping) throws SQLException {
     if (resultMap.hasNestedResultMaps()) {
       ensureNoRowBounds();
@@ -385,7 +385,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   }
 
   //
-  // PROPERTY MAPPINGS
+  // PROPERTY MAPPINGS 也包括组合列 组合列和 select 成对儿出现 最终查询出一个对象设置给某个属性
   //
 
   private boolean applyPropertyMappings(ResultSetWrapper rsw, ResultMap resultMap, MetaObject metaObject, ResultLoaderMap lazyLoader, String columnPrefix)
@@ -399,10 +399,11 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         // todo 为什么要忽略？？？？ 什么时候可以忽略 有嵌套 resultMapp 的时候应该怎么处理
         // the user added a column attribute to a nested result map, ignore it
         column = null;
+
       }
       if (propertyMapping.isCompositeResult()
           || (column != null && mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH))) // todo mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH)) 有没有 有用，因为在 嵌套查询中的列名虽然不为空，但也不会在 mappedColumnNames.contains 中包括
-          || propertyMapping.getResultSet() != null) { // todo mappedColumnNames 是干啥的？？？ 为啥需要 mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH)) ？？？ 感觉是不需要的，因为 mappedColumnNames+unmappedColumnNames=fullNames(从结果集中查询出来的所有的列名集合) mappedColumnNames 是从 fullNames 集合中遍历并且该列名在 resultMappings（也包括组合列名） 中出现过才会加入
+          || propertyMapping.getResultSet() != null) { // todo mappedColumnNames 是干啥的？？？ 为啥需要 mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH)) ？？？ 感觉是不需要的，因为 mappedColumnNames+unmappedColumnNames=fullNames(从结果集中查询出来的所有的列名集合) mappedColumnNames 是从 fullNames 集合中遍历并且该列名在 resultMappings（也包括组合列名） 中出现过才会加入 也就是说 mappedColumnNames 是 resultMapping 中的列名和结果集中的列名的交集。
         Object value = getPropertyMappingValue(rsw.getResultSet(), metaObject, propertyMapping, lazyLoader, columnPrefix);
         // issue #541 make property optional
         final String property = propertyMapping.getProperty();
@@ -420,7 +421,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     return foundValues;
   }
   /**
-   * todo 根据属性名称获取到相应的值 有三种情况：1、该属性映射关联了一个嵌套查询语句，通过嵌套查询语句查询出该属性的值 2、该属性映射关联了一个结果集 3、属性类型是原生类型，属性值直接通过 resultSet 获取     嵌套 resultMap 该怎么处理呢？？？？？？？
+   * todo 根据属性名称获取到相应的值 有三种情况：1、该属性映射关联了一个嵌套查询语句，通过嵌套查询语句查询出该属性的值 2、该属性映射关联了一个结果集 3、属性类型是原生类型，属性值直接通过 resultSet 获取     嵌套 resultMap 该怎么处理呢？？？？？？？ 嵌套 resultMap 不经过这里是由 applyNestedResultMappings 处理
    * @param rs
    * @param metaResultObject
    * @param propertyMapping
@@ -879,22 +880,38 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       } else {
         rowValue = getRowValue(rsw, discriminatedResultMap, rowKey, rowKey, null, partialObject);
         if (partialObject == null) {
+          // todo 什么时候 partialObject 对象不为 null ??? 例如：people 里有 pets pets 里有多个 pet 对象，sql 语句类似：SELECT people.id as people_id, people.name as people_name, pet.id as pet_id, pet.name as pet_name, pet.owner_id FROM people people, pet pet WHERE people.id=1 AND pet.owner_id=people.id 查询出来的结果是：
+          // people_id people_name pet_id pet_name owner_id
+          // 1         张三         1      dog      1
+          // 1         张三         2      cat      1
+          // 最终映射为对象就是一个 people 里有个 pets 集合，pets 集合里有两个 pet 对象。
           storeObject(resultHandler, resultContext, rowValue, parentMapping, rsw.getResultSet());
         }
       }
     }
     if (rowValue != null && mappedStatement.isResultOrdered() && shouldProcessMoreRows(resultContext, rowBounds)) {
       storeObject(resultHandler, resultContext, rowValue, parentMapping, rsw.getResultSet());
-    }
+    } // todo 这又是干啥的，为什么在循环里边 storeObject 过有需要 storeObject ？？？
   }
 
   //
-  // GET VALUE FROM ROW FOR NESTED RESULT MAP todo 有几个重载的 getRowValue(); 为什么设计成这样？？
+  // GET VALUE FROM ROW FOR NESTED RESULT MAP todo 有几个重载的 getRowValue(); 为什么设计成这样？？参数少的 getRowValue(); 是为简单 ResultMap 设计的，参数多的 getRowValue 是为嵌套 ResultMap 设计的
   //
 
+  /**
+   * 递归调用 getRowValue()->applyNestedResultMappings()->getRowValue()
+   * @param rsw
+   * @param resultMap
+   * @param combinedKey
+   * @param absoluteKey
+   * @param columnPrefix
+   * @param partialObject
+   * @return
+     * @throws SQLException
+     */
   private Object getRowValue(ResultSetWrapper rsw, ResultMap resultMap, CacheKey combinedKey, CacheKey absoluteKey, String columnPrefix, Object partialObject) throws SQLException {
     final String resultMapId = resultMap.getId();
-    Object resultObject = partialObject; // todo 什么时候 partialObject 不为空？？？
+    Object resultObject = partialObject; // 什么时候 partialObject 不为空？比如 people 里有 pets pets 里有多个 pet 当获取第二个 people 时 partialObject 就不为空。
     if (resultObject != null) {
       final MetaObject metaObject = configuration.newMetaObject(resultObject);
       putAncestor(absoluteKey, resultObject, resultMapId, columnPrefix);
@@ -910,14 +927,14 @@ public class DefaultResultSetHandler implements ResultSetHandler {
           foundValues = applyAutomaticMappings(rsw, resultMap, metaObject, columnPrefix) || foundValues;
         }
         foundValues = applyPropertyMappings(rsw, resultMap, metaObject, lazyLoader, columnPrefix) || foundValues;
-        putAncestor(absoluteKey, resultObject, resultMapId, columnPrefix);
+        putAncestor(absoluteKey, resultObject, resultMapId, columnPrefix); // 在 applyNestedResultMappings(); 之前保存祖先对象，之后再移除，再设置其属性的时候属性里又可能需要到祖先对象，所以属性设置完毕之后移除祖先对象
         foundValues = applyNestedResultMappings(rsw, resultMap, metaObject, columnPrefix, combinedKey, true) || foundValues;
-        ancestorObjects.remove(absoluteKey); // todo 为什么要移除呢？？？
+        ancestorObjects.remove(absoluteKey); // todo 为什么要移除呢？？？ 最先对象是为获取其子对象服务的（子对象里可能又有祖先对象，比如 a 中有 b b 中又有 a 此时 b 是子对象，当把 b 中的所有属性都获取到从而 b 的值也就获取到了，所以可以把 b 从祖先对象集合中移除了。在获取 b 的值时用到了祖先对象集合，a 的值是通过从祖先对象集合中获取到的，然后再设置到 b 中，如果不是这样做的话，很有可能会造成死循环）
         foundValues = lazyLoader.size() > 0 || foundValues;
         resultObject = foundValues ? resultObject : null;
       }
-      if (combinedKey != CacheKey.NULL_CACHE_KEY) {
-        nestedResultObjects.put(combinedKey, resultObject);
+      if (combinedKey != CacheKey.NULL_CACHE_KEY) { // todo 什么时候 combinedKey 是 CacheKey.NULL_CACHE_KEY
+        nestedResultObjects.put(combinedKey, resultObject); // todo 这又是干啥的
       }
     }
     return resultObject;
@@ -931,7 +948,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   }
 
   //
-  // NESTED RESULT MAP (JOIN MAPPING) todo
+  // NESTED RESULT MAP (JOIN MAPPING) todo parentRowKey 是指父对象的缓存 key
   //
 
   private boolean applyNestedResultMappings(ResultSetWrapper rsw, ResultMap resultMap, MetaObject metaObject, String parentPrefix, CacheKey parentRowKey, boolean newObject) {
@@ -946,21 +963,21 @@ public class DefaultResultSetHandler implements ResultSetHandler {
           Object ancestorObject = null;
           if (ancestorColumnPrefix.containsKey(nestedResultMapId)) { // todo 什么时候会 containsKey 呢？？？
             rowKey = createRowKey(nestedResultMap, rsw, ancestorColumnPrefix.get(nestedResultMapId));
-            ancestorObject = ancestorObjects.get(rowKey);
+            ancestorObject = ancestorObjects.get(rowKey); // todo 这儿的 ancestorObject 是不是一定不为 null ，不是的，还有可能是为 null 的
           }
           if (ancestorObject != null) {
-            if (newObject) {
+            if (newObject) { // todo 为什么新的对象就需要链接旧的就不需要
               linkObjects(metaObject, resultMapping, ancestorObject); // issue #385
             }
           } else {
             rowKey = createRowKey(nestedResultMap, rsw, columnPrefix);
-            final CacheKey combinedKey = combineKeys(rowKey, parentRowKey); // todo 为什么要把两者的 key 结合起来呢？？？
+            final CacheKey combinedKey = combineKeys(rowKey, parentRowKey); // todo 为什么要把两者的 key 结合起来呢？？？ 大概是不加父 key 的话会出现重复的 key ??? 有可能，比如张三的语文成绩是 80 李四的语文成绩也是 80 ，成绩表里本身是有主键的，但学生和成绩表联合查询之后在 select 语句中可能并没有查询出主键，这样一来两个语文成绩都是 80 分，它们的缓存 key 自然也是相同的，但是它们的父对象学生的缓存 key 是不同的，所以需要把父对象的缓存 key 和 子对象的缓存 key 相结合，这样一来缓存 key 就是唯一的。
             Object rowValue = nestedResultObjects.get(combinedKey);
-            boolean knownValue = (rowValue != null);
-            instantiateCollectionPropertyIfAppropriate(resultMapping, metaObject); // mandatory  todo 作用
+            boolean knownValue = (rowValue != null); // rowValue 的作用应该是为了设置 knowValue 的值，因为在下面又对 rowValue 重新赋值了
+            instantiateCollectionPropertyIfAppropriate(resultMapping, metaObject); // mandatory  todo 作用 初始化属性的集合类型 例如 A 有属性 list List 则会给 list = new ArrayList();
             if (anyNotNullColumnHasValue(resultMapping, columnPrefix, rsw.getResultSet())) {
-              rowValue = getRowValue(rsw, nestedResultMap, combinedKey, rowKey, columnPrefix, rowValue);
-              if (rowValue != null && !knownValue) {
+              rowValue = getRowValue(rsw, nestedResultMap, combinedKey, rowKey, columnPrefix, rowValue);// todo rowValue 为什么要重复赋值 如果从缓存中获取到值以后为什么还需要重新调用 getRowValue(); 来获取值？
+              if (rowValue != null && !knownValue) { // todo 什么时候 knowValue 的值为 true ???
                 linkObjects(metaObject, resultMapping, rowValue);
                 foundValues = true;
               }
@@ -993,7 +1010,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       for (String column: notNullColumns) {
         rs.getObject(prependPrefix(column, columnPrefix));
         if (!rs.wasNull()) {
-          anyNotNullColumnHasValue = true;
+          anyNotNullColumnHasValue = true; // 非空列集合中的任何一列对应的值不为空则 anyNotNullColumnHasValue 为真。
           break;
         }
       }
