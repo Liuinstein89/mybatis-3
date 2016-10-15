@@ -1,16 +1,16 @@
-package shfq.vo;
+package shfq.one_to_many2.vo;
 
-import org.apache.ibatis.type.Alias;
+import java.util.List;
 
 /**
  * author:      shfq
  * description:
- * create date: 2016/7/11.
+ * create date: 2016/8/2.
  */
-@Alias("my_person")
-public class Person {
+public class People2 {
     private int id;
     private String name;
+    private List<Pet2> pets;
 
     public int getId() {
         return id;
@@ -26,5 +26,13 @@ public class Person {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<Pet2> getPets() {
+        return pets;
+    }
+
+    public void setPets(List<Pet2> pets) {
+        this.pets = pets;
     }
 }

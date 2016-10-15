@@ -1,11 +1,9 @@
-package shfq.vo;
+package shfq.lazy_load.vo;
 
 /**
- * author:      shfq
- * description:
- * create date: 2016/7/11.
+ * Created by shfq on 2016/10/15.
  */
-public class Blog {
+public class Author {
     private int id;
     private String name;
 

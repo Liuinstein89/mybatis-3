@@ -131,7 +131,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   public List<Object> handleResultSets(Statement stmt) throws SQLException {
     ErrorContext.instance().activity("handling results").object(mappedStatement.getId());
 
-    // todo 返回值 会保存 resultMap 中的返回值但并不是保存每个 resultMap 中的返回值，但原因不知道
+    // 返回值 会保存 resultMap 中的返回值但并不是保存每个 resultMap 中的返回值，内层 resultMap 中的返回值其实是最外层 resultMap 中的返回值的属性，不需要保存，但需要把这些属性设置到父对象上。
     final List<Object> multipleResults = new ArrayList<Object>();
 
     int resultSetCount = 0;
@@ -396,14 +396,14 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     for (ResultMapping propertyMapping : propertyMappings) {
       String column = prependPrefix(propertyMapping.getColumn(), columnPrefix);
       if (propertyMapping.getNestedResultMapId() != null) {
-        // todo 为什么要忽略？？？？ 什么时候可以忽略 有嵌套 resultMapp 的时候应该怎么处理
+        // 在有嵌套 resultMap 的时候不会用列名，为什么不用呢？嵌套 resultMap 其实确定了一个对象，这个对象的属性映射与 parent resultMapping 的这个列名没关系
         // the user added a column attribute to a nested result map, ignore it
         column = null;
 
       }
       if (propertyMapping.isCompositeResult()
           || (column != null && mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH))) // todo mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH)) 有没有 有用，因为在 嵌套查询中的列名虽然不为空，但也不会在 mappedColumnNames.contains 中包括
-          || propertyMapping.getResultSet() != null) { // todo mappedColumnNames 是干啥的？？？ 为啥需要 mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH)) ？？？ 感觉是不需要的，因为 mappedColumnNames+unmappedColumnNames=fullNames(从结果集中查询出来的所有的列名集合) mappedColumnNames 是从 fullNames 集合中遍历并且该列名在 resultMappings（也包括组合列名） 中出现过才会加入 也就是说 mappedColumnNames 是 resultMapping 中的列名和结果集中的列名的交集。
+          || propertyMapping.getResultSet() != null) { // mappedColumnNames 是干啥的？为啥需要 mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH)) ？？？ 感觉是不需要的，因为 mappedColumnNames+unmappedColumnNames=fullNames(从结果集中查询出来的所有的列名集合) mappedColumnNames 是从 fullNames 集合中遍历并且该列名在 resultMappings（也包括组合列名） 中出现过才会加入 也就是说 mappedColumnNames 是 resultMapping 中的列名和结果集中的列名的交集。
         Object value = getPropertyMappingValue(rsw.getResultSet(), metaObject, propertyMapping, lazyLoader, columnPrefix);
         // issue #541 make property optional
         final String property = propertyMapping.getProperty();
@@ -436,7 +436,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     if (propertyMapping.getNestedQueryId() != null) {
       return getNestedQueryMappingValue(rs, metaResultObject, propertyMapping, lazyLoader, columnPrefix);
     } else if (propertyMapping.getResultSet() != null) {
-      // todo propertyMapping.getResultSet() != null 这种情况是哪种情况???? 有存储过程的时候
+      // 在有存储过程的时候可能会出现多个结果集 propertyMapping.getResultSet() != null
       addPendingChildRelation(rs, metaResultObject, propertyMapping);   // TODO is that OK?
       return DEFERED;
     } else {
@@ -924,24 +924,24 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         final MetaObject metaObject = configuration.newMetaObject(resultObject);
         boolean foundValues = !resultMap.getConstructorResultMappings().isEmpty();
         if (shouldApplyAutomaticMappings(resultMap, true)) { // 如果是嵌套 resultMap 传 true ，否则传 false
-          foundValues = applyAutomaticMappings(rsw, resultMap, metaObject, columnPrefix) || foundValues;
+          foundValues = applyAutomaticMappings(rsw, resultMap, metaObject, columnPrefix) || foundValues; // 自动映射属性，嵌套 resultMap 默认不自动映射
         }
         foundValues = applyPropertyMappings(rsw, resultMap, metaObject, lazyLoader, columnPrefix) || foundValues;
         putAncestor(absoluteKey, resultObject, resultMapId, columnPrefix); // 在 applyNestedResultMappings(); 之前保存祖先对象，之后再移除，再设置其属性的时候属性里又可能需要到祖先对象，所以属性设置完毕之后移除祖先对象
         foundValues = applyNestedResultMappings(rsw, resultMap, metaObject, columnPrefix, combinedKey, true) || foundValues; // 对一个对象的复杂属性进行设值，缓存中没有对象，则最后一个参数传 true .
-        ancestorObjects.remove(absoluteKey); // todo 为什么要移除呢？？？ 最先对象是为获取其子对象服务的（子对象里可能又有祖先对象，比如 a 中有 b b 中又有 a 此时 b 是子对象，当把 b 中的所有属性都获取到从而 b 的值也就获取到了，所以可以把 b 从祖先对象集合中移除了。在获取 b 的值时用到了祖先对象集合，a 的值是通过从祖先对象集合中获取到的，然后再设置到 b 中，如果不是这样做的话，很有可能会造成死循环）
+        ancestorObjects.remove(absoluteKey); // todo 为什么要移除呢？？？ 祖先对象是为获取其子对象服务的（子对象里可能又有祖先对象，比如 a 中有 b b 中又有 a 此时 b 是子对象，当把 b 中的所有属性都获取到从而 b 的值也就获取到了，所以可以把 b 从祖先对象集合中移除了。在获取 b 的值时用到了祖先对象集合，a 的值是通过从祖先对象集合中获取到的，然后再设置到 b 中，如果不是这样做的话，很有可能会造成死循环）
         foundValues = lazyLoader.size() > 0 || foundValues;
-        resultObject = foundValues ? resultObject : null;
+        resultObject = foundValues ? resultObject : null; // 如果所有的 resultMapping 中的列名和结果集中的列名没有交集或者是有交集的列值都是空值则 foundValues 为 false ，在这种情况下会返回 null 而不是创建好的那个 resultValue
       }
-      dd // todo 到底什么时候 combinedKey == CacheKey.NULL_CACHE_KEY
-      if (combinedKey != CacheKey.NULL_CACHE_KEY) { // todo 什么时候 combinedKey 是 CacheKey.NULL_CACHE_KEY
-        nestedResultObjects.put(combinedKey, resultObject); // todo 这又是干啥的
+      // 到底什么时候 combinedKey == CacheKey.NULL_CACHE_KEY? 见 one_to_many_null_cache_key 包
+      if (combinedKey != CacheKey.NULL_CACHE_KEY) {
+        nestedResultObjects.put(combinedKey, resultObject);
       }
     }
     return resultObject;
   }
 
-  private void putAncestor(CacheKey rowKey, Object resultObject, String resultMapId, String columnPrefix) { // todo 这是干什么的 好像只会在嵌套 resultMap 中使用
+  private void putAncestor(CacheKey rowKey, Object resultObject, String resultMapId, String columnPrefix) { // 存放祖先对象 只会在嵌套 resultMap 中使用
     if (!ancestorColumnPrefix.containsKey(resultMapId)) {
       ancestorColumnPrefix.put(resultMapId, columnPrefix);
     }
@@ -962,9 +962,9 @@ public class DefaultResultSetHandler implements ResultSetHandler {
           final ResultMap nestedResultMap = getNestedResultMap(rsw.getResultSet(), nestedResultMapId, columnPrefix);
           CacheKey rowKey = null;
           Object ancestorObject = null;
-          if (ancestorColumnPrefix.containsKey(nestedResultMapId)) { // todo 什么时候会 containsKey 呢？？？
-            rowKey = createRowKey(nestedResultMap, rsw, ancestorColumnPrefix.get(nestedResultMapId));
-            ancestorObject = ancestorObjects.get(rowKey); // todo 这儿的 ancestorObject 是不是一定不为 null ，不是的，还有可能是为 null 的。比如在迭代结果集的第二行数据的时候 ancestorColumnPrefix 里一定会有所有 resultMapId 但并不是所有的对象都是当前属性的所属对象的祖先对象。举个具体的例子，比如 People->pets 在获取 people 对象 pets 集合中的第二个 pet 的时候，ancestorColumnPrefix 集合中包含着 resultMapId 但 ancestorObjects 集合中是没有 pet 对象的。只有在调用 applyNestedResultMappings(); 方法获取 pet 对象的属性之前（已经创建好 pet 对象）才会把 pet 对象加入到祖先对象集合中，而此时还没有创建 pet 呢。
+          if (ancestorColumnPrefix.containsKey(nestedResultMapId)) {
+            rowKey = createRowKey(nestedResultMap, rsw, ancestorColumnPrefix.get(nestedResultMapId)); // 此处创建缓存 key 时传的列名前缀和下面 else 块中 createRowKey() 传的列名前缀参数是不一样的。前者主要是看祖先缓存中有没有该对象，所以在创建缓存 key 时传的列前缀应该和之前创建祖先对象的缓存 key 时传的参数是一样的，之前创建祖先对象的缓存 key 时传的参数是保存在 ancestorColumnPrefix map 中，键是 resultMap id 。而后者创建缓存 key 时需要根据父列名前缀和当前 resultMap 的列名前缀组合来获取具体的列值来创建缓存 key 。
+            ancestorObject = ancestorObjects.get(rowKey); // 这儿的 ancestorObject 是不是一定不为 null ，不是的，还有可能是为 null 的。比如在迭代结果集的第二行数据的时候 ancestorColumnPrefix 里一定会有所有 resultMapId 但并不是所有的对象都是当前属性的所属对象的祖先对象。举个具体的例子，比如 People->pets 在获取 people 对象 pets 集合中的第二个 pet 的时候，ancestorColumnPrefix 集合中包含着 resultMapId 但 ancestorObjects 集合中是没有 pet 对象的。只有在调用 applyNestedResultMappings(); 方法获取 pet 对象的属性之前（已经创建好 pet 对象）才会把 pet 对象加入到祖先对象集合中，而此时还没有创建 pet 呢。
           }
           if (ancestorObject != null) {
             if (newObject) { // todo 为什么新的对象就需要链接旧的就不需要。 // 构造一个 A 里有 People 的类，试试看是什么效果？？？？ // todo 还是不知道在哪种场景下 ancestorObject 对象不为 null 但 newObject 为 false ？？？？ 可能在这种复杂的情况下是存在的：People->pets->Pet->C->People 模式下有两行数据：1、people1->pets->pet1->c1->people1 2、people1->pets->pet2->c1->people1 好像这种情形还是无法满足条件！！！到底能不能满足好像还是不清楚，需要构造数据来验证一下，或者认真分析一下代码？？？
@@ -972,7 +972,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
             }
           } else {
             rowKey = createRowKey(nestedResultMap, rsw, columnPrefix);
-            final CacheKey combinedKey = combineKeys(rowKey, parentRowKey); // todo 为什么要把两者的 key 结合起来呢？？？ 大概是不加父 key 的话会出现重复的 key ??? 有可能，比如张三的语文成绩是 80 李四的语文成绩也是 80 ，成绩表里本身是有主键的，但学生和成绩表联合查询之后在 select 语句中可能并没有查询出主键，这样一来两个语文成绩都是 80 分，它们的缓存 key 自然也是相同的，但是它们的父对象学生的缓存 key 是不同的，所以需要把父对象的缓存 key 和 子对象的缓存 key 相结合，这样一来缓存 key 就是唯一的。
+            final CacheKey combinedKey = combineKeys(rowKey, parentRowKey); // 为什么要把两者的 key 结合起来呢？？？ 大概是不加父 key 的话会出现重复的 key ??? 有可能，比如张三的语文成绩是 80 李四的语文成绩也是 80 ，成绩表里本身是有主键的，但学生和成绩表联合查询之后在 select 语句中可能并没有查询出主键，这样一来两个语文成绩都是 80 分，它们的缓存 key 自然也是相同的，但是它们的父对象学生的缓存 key 是不同的，所以需要把父对象的缓存 key 和 子对象的缓存 key 相结合，这样一来缓存 key 就是唯一的。这样做有可能本来是同一个对象但却创建了两个或多个对象，这些对象的属性值是相同的的，但这几个对象不是同一个对象。可以见 one_to_many2 包，petHouse 是同一个，但创建了两次，不过两个对象的属性值是相同的，好像也没有什么问题。因为子 rowKey 相同的情况下，mybatis 无法判断它们是不是同一个对象。只有最外层的对象可以从 nestedResultObjects 集合中取到，因为最外层的对象是从 handleRowValuesForNestedResultMap() 方法中创建的缓存 rowKey ，其传递给 getRowValue() 方法中的 combinedKey 参数就是 rowKey 两者是相同的，所以能取到，<resultMap/> 里面嵌套的 <resultMap/> 所确定的嵌套对象在 nestedResultObjects 集合中几乎是用不到的，为什么？因为获取到内层对象时需要 combinedKey ，一般来说父 key 是不相同的，除非父父 key 也相同，则所有的父对象都相同，一般是不会出现这种情况的。
             Object rowValue = nestedResultObjects.get(combinedKey);
             boolean knownValue = (rowValue != null); // rowValue 的作用应该是为了设置 knowValue 的值，因为在下面又对 rowValue 重新赋值了
             instantiateCollectionPropertyIfAppropriate(resultMapping, metaObject); // mandatory  todo 作用 初始化属性的集合类型 例如 A 有属性 list List 则会给 list = new ArrayList();
@@ -1068,14 +1068,14 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     List<ResultMapping> resultMappings = resultMap.getIdResultMappings();
     if (resultMappings.size() == 0) { // todo 应该走不到这儿，在 build resultMap 的时候如果没有 id ，就会把所有的 resultMapping 添加到 idResultMappings
       // 如果没有 id 的话则需要每个 PropertyResultMapping
-      // 有可能为空，如果所有的字段映射都是通过构造方法设置的话
+      // 有可能为空，如果所有的字段映射都是通过构造方法设置的话 todo 如果 idResultMappings 为空，如果在构造方法中也传递了参数，这样一来是不是参与构造缓存 key 的属性就少了一部分，会不会有问题
       resultMappings = resultMap.getPropertyResultMappings();
     }
     return resultMappings;
   }
 
   /**
-   * 递归调用设置一个对象的缓存 key
+   * 递归调用设置一个对象的缓存 key todo 如果 a 中有 b b 中有 a 会不会造成死循环？？？？
    * @param resultMap
    * @param rsw
    * @param cacheKey

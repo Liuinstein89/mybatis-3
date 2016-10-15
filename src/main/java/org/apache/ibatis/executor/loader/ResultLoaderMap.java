@@ -55,7 +55,7 @@ public class ResultLoaderMap {
               "' for query id '" + resultLoader.mappedStatement.getId() +
               " already exists in the result map. The leftmost property of all lazy loaded properties must be unique within a result map.");
     }
-    loaderMap.put(upperFirst, new LoadPair(property, metaResultObject, resultLoader));
+    loaderMap.put(upperFirst, new LoadPair(property, metaResultObject, resultLoader)); / 可以记住 LoadPair 的内容结合源码来阅读，好像 debug 对懒加载不起作用拦截不到懒加载的部分 在执行这一行的时候 author 就突然加载出来了
   }
 
   public final Map<String, LoadPair> getProperties() {

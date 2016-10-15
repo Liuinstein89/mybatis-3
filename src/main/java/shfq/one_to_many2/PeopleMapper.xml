@@ -1,0 +1,28 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "shfq.one_many_annotation.People">
+
+    <resultMap id="peopleResultMap" type="shfq.one_to_many2.vo.People2">
+        <id column="people_id" property="id"></id>
+        <result column="people_name" property="name"></result>
+        <collection property="pets" ofType="shfq.one_to_many2.vo.Pet2" resultMap="myPets">
+        </collection>
+    </resultMap>
+    <resultMap id="petHouse" type="shfq.one_to_many2.vo.PetHouse">
+        <id column="house_id" property="id"></id>
+        <result column="house_location" property="location"></result>
+        <association property="owner" resultMap="peopleResultMap"></association>
+        <collection property="pets" ofType="shfq.one_to_many2.vo.Pet2" resultMap="myPets">
+        </collection>
+    </resultMap>
+    <resultMap id="myPets" type="shfq.one_to_many2.vo.Pet2">
+        <id column="pet_id" property="id"></id>
+        <result column="pet_name" property="name"></result>
+        <result column="people_id" property="ownerId"></result>
+        <association property="petHouse" resultMap="petHouse"></association>
+    </resultMap>
+    <select id="selectPeople" parameterType="int" resultMap="peopleResultMap">
+        SELECT people.id as people_id, people.name as people_name, pet.id as pet_id, pet.name as pet_name, pet.house_id, house.location as house_location, house.owner_id FROM people2 people, pet2 pet, pet_house house WHERE people.id=#{id} AND pet.owner_id=people.id and house_id=house.id
+    </select>
+</mapper>

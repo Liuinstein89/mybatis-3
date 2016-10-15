@@ -1,0 +1,19 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "shfq.one_many_annotation.People">
+
+    <resultMap id="peopleResultMap" type="shfq.one_to_many3.vo.People3">
+        <id column="id" property="id"></id>
+        <result column="name" property="name"></result>
+        <association property="father" resultMap="peopleResultMap" columnPrefix="father_">
+        </association>
+        <collection property="children" ofType="shfq.one_to_many3.vo.People3" resultMap="peopleResultMap" columnPrefix="child_">
+        </collection>
+    </resultMap>
+
+
+    <select id="selectPeople" parameterType="int" resultMap="peopleResultMap">
+        select father.id as father_id, father.name as father_name, self.name, self.id, child.name as child_name, child.id as child_id from people3 as father, people3 self, people3 child where self.father_id=father.id and self.id=child.father_id and self.id=#{id}
+    </select>
+</mapper>

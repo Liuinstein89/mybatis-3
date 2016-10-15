@@ -27,7 +27,7 @@ Configuration.checkLocallyForDiscriminatedNestedResultMaps();
 几个疑问：
 
 -- 嵌套 resultMap 中，在属性映射的时候，如果这个属性如果是复合属性是怎么映射的？
--- 构造方法中可不可以传一个符合对象类型？？？？
+-- 构造方法中可不可以传一个复合对象类型？？？？
 -- partialObject 什么时候不为空？
 -- resultMap 中的 extends
 -- 在 <select/> 中的 resultType 是不是也相当于是一个 <resultMap/>

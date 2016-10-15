@@ -40,7 +40,7 @@ import org.apache.ibatis.reflection.property.PropertyNamer;
 import org.apache.ibatis.session.Configuration;
 
 /**
- * @author Eduardo Macarron
+ * @author Eduardo Macarron todo 什么时候用 javassist 什么时候用 cglib???
  */
 public class JavassistProxyFactory implements org.apache.ibatis.executor.loader.ProxyFactory {
 
