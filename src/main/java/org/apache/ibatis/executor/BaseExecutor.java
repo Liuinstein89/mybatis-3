@@ -145,7 +145,7 @@ public abstract class BaseExecutor implements Executor {
     }
     List<E> list;
     try {
-      // queryStack 为什么要 ++ 因为在查询的过程中会有递归调用，query() 方法会间接地调用自己，queryStack 表示的是调用自己的次数
+      // queryStack 为什么要 ++ 因为在查询的过程中会有递归调用，query() 方法会间接地调用自己，queryStack 表示的是调用 query() 方法的次数
       queryStack++;
       // todo 为什么 resultHandler 为空的时候要查缓存
       list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
@@ -333,7 +333,7 @@ public abstract class BaseExecutor implements Executor {
 
   private <E> List<E> queryFromDatabase(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
     List<E> list;
-    // todo 为什么要用临时占位呢????? 正在查询对象，对象还没有查询出来，此时用临时占位，在查询的过程中有可能再次需要查询该对象，用临时占位符，表示该对象已经在缓存中
+    // 为什么要用临时占位呢?正在查询对象，对象还没有查询出来，此时用临时占位，在查询的过程中有可能再次需要查询该对象，用临时占位符，表示该对象已经在缓存中
     localCache.putObject(key, EXECUTION_PLACEHOLDER);
     try {
       list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);

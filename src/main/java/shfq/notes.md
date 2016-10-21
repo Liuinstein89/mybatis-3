@@ -50,3 +50,13 @@ Configuration.checkLocallyForDiscriminatedNestedResultMaps();
 几个结论：
 
 -- 在有嵌套 resultMap 中的 resultMapping 中的 column 是没有作用的，所以 <collection/> 等中的 column 属性是没有用的。
+
+以后应该再写几篇博客：
+-- mybatis 事务管理（一种是利用 jdbc 来管理，另外一种是托管给容器，让容器来管理事务）
+-- 连接池
+-- 懒加载
+-- 怎样利用注解来增、删、改、查
+-- 基本的执行过程
+-- 阅读 mybatis 的知识储备以及难点
+-- mybatis 的配置文件映射
+-- mybatis 的缓存（一级缓存和二级缓存）

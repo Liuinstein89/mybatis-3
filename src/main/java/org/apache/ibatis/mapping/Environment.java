@@ -20,7 +20,7 @@ import javax.sql.DataSource;
 import org.apache.ibatis.transaction.TransactionFactory;
 
 /**
- * @author Clinton Begin
+ * @author Clinton Begin 环境封装了一个数据库 包括数据库的 id 数据源 事务工厂
  */
 public final class Environment {
   private final String id;

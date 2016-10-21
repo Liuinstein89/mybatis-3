@@ -27,6 +27,7 @@
     </properties>
     <settings>
         <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <setting name="aggressiveLazyLoading" value="true"/>
     </settings>
     <environments default="development">
         <environment id="development">
@@ -41,5 +42,6 @@
     </environments>
     <mappers>
         <mapper resource="shfq/lazy_load/BlogMapper.xml"></mapper>
+        <mapper resource="shfq/lazy_load/AuthorMapper.xml"></mapper>
     </mappers>
 </configuration>

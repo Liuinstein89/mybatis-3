@@ -421,7 +421,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     return foundValues;
   }
   /**
-   * todo 根据属性名称获取到相应的值 有三种情况：1、该属性映射关联了一个嵌套查询语句，通过嵌套查询语句查询出该属性的值 2、该属性映射关联了一个结果集 3、属性类型是原生类型，属性值直接通过 resultSet 获取     嵌套 resultMap 该怎么处理呢？？？？？？？ 嵌套 resultMap 不经过这里是由 applyNestedResultMappings 处理
+   * 根据属性名称获取到相应的值 有三种情况：1、该属性映射关联了一个嵌套查询语句，通过嵌套查询语句查询出该属性的值 2、该属性映射关联了一个结果集 3、属性类型是原生类型，属性值直接通过 resultSet 获取     嵌套 resultMap 该怎么处理呢？？？？？？？ 嵌套 resultMap 不经过这里是由 applyNestedResultMappings 处理
    * @param rs
    * @param metaResultObject
    * @param propertyMapping
@@ -613,12 +613,12 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       final String column = constructorMapping.getColumn();
       final Object value;
       try {
-        if (constructorMapping.getNestedQueryId() != null) {
+        if (constructorMapping.getNestedQueryId() != null) {// 构造方法里如果有需要嵌套查询出来的属性
           value = getNestedQueryConstructorValue(rsw.getResultSet(), constructorMapping, columnPrefix);
-        } else if (constructorMapping.getNestedResultMapId() != null) {
+        } else if (constructorMapping.getNestedResultMapId() != null) {// 构造方法里如果有嵌套结果属性
           final ResultMap resultMap = configuration.getResultMap(constructorMapping.getNestedResultMapId());
           value = getRowValue(rsw, resultMap);
-        } else {
+        } else {// 简单类型的属性
           final TypeHandler<?> typeHandler = constructorMapping.getTypeHandler();
           value = typeHandler.getResult(rsw.getResultSet(), prependPrefix(column, columnPrefix));
         }
@@ -918,7 +918,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       applyNestedResultMappings(rsw, resultMap, metaObject, columnPrefix, combinedKey, false); // 从缓存中取出的对象时最后一个参数传递 false
       ancestorObjects.remove(absoluteKey);
     } else {
-      final ResultLoaderMap lazyLoader = new ResultLoaderMap();
+      final ResultLoaderMap lazyLoader = new ResultLoaderMap(); // 用于懒加载 一个对象（调用 getRowValue() 方法后获得的对象）的所有需要懒加载的属性以及加载这个属性所需要的条件都封装到了 ResultLoaderMap 里面
       resultObject = createResultObject(rsw, resultMap, lazyLoader, columnPrefix);
       if (resultObject != null && !typeHandlerRegistry.hasTypeHandler(resultMap.getType())) { // typeHandlerRegistry.hasTypeHandler(resultMap.getType()) 嵌套对象是个简单类型
         final MetaObject metaObject = configuration.newMetaObject(resultObject);

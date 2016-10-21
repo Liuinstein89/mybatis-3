@@ -18,7 +18,7 @@ package org.apache.ibatis.executor.loader;
 import java.io.ObjectStreamException;
 
 /**
- * @author Eduardo Macarron
+ * @author Eduardo Macarron 通过 javassist 创建的代理对象会实现这个接口，为什么要实现这个接口？
  */
 public interface WriteReplaceInterface {
 

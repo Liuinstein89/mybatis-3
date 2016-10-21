@@ -18,14 +18,8 @@
 -->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace = "shfq.composite_column.ClerkAddress">
-
-    <resultMap id="clerkAddressResultMap" type="shfq.composite_column.ClerkAddress">
-        <id column="street_no" property="streetNo"></id>
-        <id column="house_no" property="houseNo"></id>
-        <result column="street_name" property="streetName"></result>
-    </resultMap>
-    <select id="selectClerkAddress" parameterType="shfq.composite_column.ClerkAddress" resultMap="clerkAddressResultMap">
-        SELECT * from clerk_address where street_no=#{streetNo} and house_no=#{houseNo}
+<mapper namespace = "shfq.lazy_load.vo.Author">
+    <select id="selectAuthor" parameterType="int" resultType="shfq.lazy_load.vo.Author">
+        SELECT * from author where id=#{id}
     </select>
 </mapper>

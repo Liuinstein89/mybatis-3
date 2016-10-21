@@ -50,12 +50,12 @@ public class ResultLoaderMap {
 
   public void addLoader(String property, MetaObject metaResultObject, ResultLoader resultLoader) {
     String upperFirst = getUppercaseFirstProperty(property);
-    if (!upperFirst.equalsIgnoreCase(property) && loaderMap.containsKey(upperFirst)) {
+    if (!upperFirst.equalsIgnoreCase(property) && loaderMap.containsKey(upperFirst)) { // todo 不太明白
       throw new ExecutorException("Nested lazy loaded result property '" + property +
               "' for query id '" + resultLoader.mappedStatement.getId() +
               " already exists in the result map. The leftmost property of all lazy loaded properties must be unique within a result map.");
     }
-    loaderMap.put(upperFirst, new LoadPair(property, metaResultObject, resultLoader)); / 可以记住 LoadPair 的内容结合源码来阅读，好像 debug 对懒加载不起作用拦截不到懒加载的部分 在执行这一行的时候 author 就突然加载出来了
+    loaderMap.put(upperFirst, new LoadPair(property, metaResultObject, resultLoader));
   }
 
   public final Map<String, LoadPair> getProperties() {
@@ -92,12 +92,13 @@ public class ResultLoaderMap {
   }
 
   private static String getUppercaseFirstProperty(String property) {
-    String[] parts = property.split("\\.");
+    String[] parts = property.split("\\."); // todo 属性里面可能有类似 a.b 这种属性？
     return parts[0].toUpperCase(Locale.ENGLISH);
   }
 
   /**
    * Property which was not loaded yet.
+   * 封装了一个未加载的属性和加载这个属性所需要的各种条件
    */
   public static class LoadPair implements Serializable {
 
@@ -111,7 +112,7 @@ public class ResultLoaderMap {
      */
     private final transient Object serializationCheck = new Object();
     /**
-     * Meta object which sets loaded properties.
+     * Meta object which sets loaded properties. 元 result 对象，元 result 对象里有个原始对象，待加载的属性是这个原始对象的属性，这个原始对象是一个代理对象，通过 javassit 创建的对象，这个对象所属的类继承自某个 VO 。
      */
     private transient MetaObject metaResultObject;
     /**
@@ -131,11 +132,11 @@ public class ResultLoaderMap {
      */
     private String property;
     /**
-     * ID of SQL statement which loads the property.
+     * ID of SQL statement which loads the property. sql 语句的 id ，通过这个 sql 语句可以加载出待加载的属性
      */
     private String mappedStatement;
     /**
-     * Parameter of the sql statement.
+     * Parameter of the sql statement. 查询 sql 语句所需要的参数
      */
     private Serializable mappedParameter;
 
@@ -144,7 +145,7 @@ public class ResultLoaderMap {
       this.metaResultObject = metaResultObject;
       this.resultLoader = resultLoader;
 
-      /* Save required information only if original object can be serialized. */
+      /* Save required information only if original object can be serialized. */ // todo 不清楚
       if (metaResultObject != null && metaResultObject.getOriginalObject() instanceof Serializable) {
         final Object mappedStatementParameter = resultLoader.parameterObject;
 
@@ -180,13 +181,14 @@ public class ResultLoaderMap {
     }
 
     public void load(final Object userObject) throws SQLException {
-      if (this.metaResultObject == null || this.resultLoader == null) {
+      System.out.println("userObject:" + userObject);
+      if (this.metaResultObject == null || this.resultLoader == null) { // todo 这是什么情况
         if (this.mappedParameter == null) {
           throw new ExecutorException("Property [" + this.property + "] cannot be loaded because "
                   + "required parameter of mapped statement ["
                   + this.mappedStatement + "] is not serializable.");
         }
-
+        System.out.println("test:1");
         final Configuration config = this.getConfiguration();
         final MappedStatement ms = config.getMappedStatement(this.mappedStatement);
         if (ms == null) {
@@ -198,7 +200,8 @@ public class ResultLoaderMap {
 
         this.metaResultObject = config.newMetaObject(userObject);
         this.resultLoader = new ResultLoader(config, new ClosedExecutor(), ms, this.mappedParameter,
-                metaResultObject.getSetterType(this.property), null, null);
+                metaResultObject.getSetterType(this.property), null, null); // todo 为什么要传一个 ClosedExecutor ？？？
+        System.out.println("test:2");
       }
 
       /* We are using a new executor because we may be (and likely are) on a new thread
@@ -209,8 +212,9 @@ public class ResultLoaderMap {
         final ResultLoader old = this.resultLoader;
         this.resultLoader = new ResultLoader(old.configuration, new ClosedExecutor(), old.mappedStatement,
                 old.parameterObject, old.targetType, old.cacheKey, old.boundSql);
+        System.out.println("test:3");
       }
-
+      System.out.println("test:4");
       this.metaResultObject.setValue(property, this.resultLoader.loadResult());
     }
 
@@ -275,6 +279,9 @@ public class ResultLoaderMap {
     }
   }
 
+  /**
+   * todo 一种特殊的 executor 不支持更新、刷新语句 为什么不支持 doQuery()？？ 主要用于查询懒加载属性，所以不支持更新
+   */
   private static final class ClosedExecutor extends BaseExecutor {
 
     public ClosedExecutor() {

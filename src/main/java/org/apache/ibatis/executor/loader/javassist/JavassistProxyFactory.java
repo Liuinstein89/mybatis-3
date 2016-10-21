@@ -73,7 +73,7 @@ public class JavassistProxyFactory implements org.apache.ibatis.executor.loader.
   static Object crateProxy(Class<?> type, MethodHandler callback, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
 
     ProxyFactory enhancer = new ProxyFactory();
-    enhancer.setSuperclass(type);
+    enhancer.setSuperclass(type);// 设置代理类所继承的类（被代理类）
 
     try {
       type.getDeclaredMethod(WRITE_REPLACE_METHOD);
@@ -101,10 +101,10 @@ public class JavassistProxyFactory implements org.apache.ibatis.executor.loader.
 
   private static class EnhancedResultObjectProxyImpl implements MethodHandler {
 
-    private Class<?> type;
+    private Class<?> type; // 被代理类的类型
     private ResultLoaderMap lazyLoader;
     private boolean aggressive;
-    private Set<String> lazyLoadTriggerMethods;
+    private Set<String> lazyLoadTriggerMethods; // 触发懒加载的几个方法：equals、clone、hashCode、toString
     private ObjectFactory objectFactory;
     private List<Class<?>> constructorArgTypes;
     private List<Object> constructorArgs;
@@ -132,7 +132,7 @@ public class JavassistProxyFactory implements org.apache.ibatis.executor.loader.
       final String methodName = method.getName();
       try {
         synchronized (lazyLoader) {
-          if (WRITE_REPLACE_METHOD.equals(methodName)) {
+          if (WRITE_REPLACE_METHOD.equals(methodName)) { // todo 不明白，什么时候谁会调用 writeReplace() 方法
             Object original = null;
             if (constructorArgTypes.isEmpty()) {
               original = objectFactory.create(type);
@@ -147,7 +147,8 @@ public class JavassistProxyFactory implements org.apache.ibatis.executor.loader.
             }
           } else {
             if (lazyLoader.size() > 0 && !FINALIZE_METHOD.equals(methodName)) {
-              if (aggressive || lazyLoadTriggerMethods.contains(methodName)) {
+              if (aggressive || lazyLoadTriggerMethods.contains(methodName)) {// 这应该是 mybatis 的一个 bug ，当 aggressive 为真时，表示当需要加载一个懒加载属性时一次性加载所有的懒加载属性，这个 aggressive 的使用前提是用到了懒加载属性，所以首先得判断当前调用的方法操作的属性是不是懒加载属性。除此之外应该是只有调用 get 方法的时候才需要，调用 set 方法的时候也是没有必要进行懒加载的。
+                System.out.println("loadAll:" + methodName);
                 lazyLoader.loadAll();
               } else if (PropertyNamer.isProperty(methodName)) {
                 final String property = PropertyNamer.methodToProperty(methodName);

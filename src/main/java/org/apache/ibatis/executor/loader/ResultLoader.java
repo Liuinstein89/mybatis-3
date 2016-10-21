@@ -73,6 +73,8 @@ public class ResultLoader {
 
   private <E> List<E> selectList() throws SQLException {
     Executor localExecutor = executor;
+    System.out.println(localExecutor.getClass());
+
     // todo? 什么情况下会发生多个线程同时访问 同一个 ResultLoader 的情况
     if (Thread.currentThread().getId() != this.creatorThreadId || localExecutor.isClosed()) {
       localExecutor = newExecutor();

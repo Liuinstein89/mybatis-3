@@ -1,4 +1,22 @@
 <?xml version = "1.0" encoding = "UTF-8"?>
+<!--
+
+       Copyright 2009-2015 the original author or authors.
+
+       Licensed under the Apache License, Version 2.0 (the "License");
+       you may not use this file except in compliance with the License.
+       You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+       Unless required by applicable law or agreed to in writing, software
+       distributed under the License is distributed on an "AS IS" BASIS,
+       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+       See the License for the specific language governing permissions and
+       limitations under the License.
+
+-->
+
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace = "shfq.lazy_load.vo.Blog">
@@ -8,14 +26,10 @@
         <result column="content" property="content"></result>
         <association property="author" column="author_id" select="selectAuthor" fetchType="lazy"/>
     </resultMap>
-    <resultMap id="authorResultMap" type="shfq.lazy_load.vo.Author">
-        <id column="id" property="id"></id>
-        <result column="name" property="name"></result>
-    </resultMap>
     <select id="selectBlog" parameterType="int" resultMap="blogResultMap">
         SELECT * from blog where id=#{id}
     </select>
-    <select id="selectAuthor" parameterType="int" resultMap="authorResultMap">
+    <select id="selectAuthor" parameterType="int" resultType="shfq.lazy_load.vo.Author">
         SELECT * from author where id=#{id}
     </select>
 </mapper>
