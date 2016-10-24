@@ -23,6 +23,13 @@ public class Blog {
     private String content;
     private Author author;
 
+    public Blog(Author author) {
+        this.author = author;
+    }
+
+    public Blog() {
+    }
+
     public int getId() {
         return id;
     }

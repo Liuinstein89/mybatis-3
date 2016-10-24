@@ -15,11 +15,15 @@
  */
 package shfq.lazy_load;
 
+import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import shfq.Utils.SessionUtil;
 import shfq.lazy_load.vo.Author;
 import shfq.lazy_load.vo.Blog;
 
+import java.io.Reader;
 import java.util.List;
 
 /**
@@ -29,7 +33,7 @@ import java.util.List;
  */
 public class Test {
     public static void main(String[] args) throws Exception {
-        selectAuthor();
+        selectBlog();
     }
 
     private static void selectBlog() throws Exception {
@@ -48,7 +52,9 @@ public class Test {
     }
 
     private static void selectAuthor() throws Exception {
-        SqlSession session = SessionUtil.getSessionByConfigXmlPath("shfq/lazy_load/mybatis-config.xml");
+        Reader reader = Resources.getResourceAsReader("shfq/lazy_load/mybatis-config.xml");
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+        SqlSession session = sqlSessionFactory.openSession();
         Object o = session.selectOne("shfq.lazy_load.vo.Author.selectAuthor", 1);
         System.out.println("");
     }

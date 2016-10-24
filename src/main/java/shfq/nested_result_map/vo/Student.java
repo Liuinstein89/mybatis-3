@@ -48,8 +48,8 @@ public class Student{
     }
 
 
-//    public Student() {
-//    }
+    public Student() {
+    }
 
     public int getId() {
         return id;

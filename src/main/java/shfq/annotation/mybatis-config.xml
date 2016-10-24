@@ -20,6 +20,9 @@
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
     <environments default="development">
         <environment id="development">
             <transactionManager type="JDBC"/>
@@ -32,13 +35,6 @@
         </environment>
     </environments>
     <mappers>
-        <!--<mapper resource="shfq/mappers/StudentQueryMapper.xml"/>-->
-        <!--<mapper resource="shfq/mappers/StudentUpdateMapper.xml"/>-->
-        <!--<mapper class="shfq.nested_result_map.mappers.StudentMapper"></mapper>-->
-        <!--<mapper class="shfq.nested_result_map.mappers.AddressMapper"/>-->
-        <!--<mapper class="shfq.one_many_annotation.PeopleMapper"/>-->
-        <!--<mapper class="shfq.one_many_annotation.PetMapper"/>-->
-        <mapper class="shfq.StudentMapper"/>
-        <!--<mapper resource="shfq/mappers/PeopleMapper.xml"></mapper>-->
+        <mapper class="shfq.annotation.AddressMapper"/>
     </mappers>
 </configuration>

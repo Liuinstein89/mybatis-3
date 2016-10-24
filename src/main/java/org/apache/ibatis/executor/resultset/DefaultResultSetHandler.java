@@ -573,6 +573,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         }
       }
     }
+
     return resultObject;
   }
 
@@ -614,7 +615,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       final Object value;
       try {
         if (constructorMapping.getNestedQueryId() != null) {// 构造方法里如果有需要嵌套查询出来的属性
-          value = getNestedQueryConstructorValue(rsw.getResultSet(), constructorMapping, columnPrefix);
+          value = getNestedQueryConstructorValue(rsw.getResultSet(), constructorMapping, columnPrefix); // todo 构造方法里如果有需要懒加载的属性怎么处理？？好像是 mybatis 的 bug 啊
         } else if (constructorMapping.getNestedResultMapId() != null) {// 构造方法里如果有嵌套结果属性
           final ResultMap resultMap = configuration.getResultMap(constructorMapping.getNestedResultMapId());
           value = getRowValue(rsw, resultMap);

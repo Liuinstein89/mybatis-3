@@ -21,14 +21,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace = "shfq.lazy_load.vo.Blog">
 
+    <select id="selectBlog" parameterType="int" resultMap="blogResultMap">
+        SELECT * from blog where id=#{id}
+    </select>
+
     <resultMap id="blogResultMap" type="shfq.lazy_load.vo.Blog">
         <id column="id" property="id"></id>
         <result column="content" property="content"></result>
         <association property="author" column="author_id" select="selectAuthor" fetchType="lazy"/>
     </resultMap>
-    <select id="selectBlog" parameterType="int" resultMap="blogResultMap">
-        SELECT * from blog where id=#{id}
-    </select>
+
     <select id="selectAuthor" parameterType="int" resultType="shfq.lazy_load.vo.Author">
         SELECT * from author where id=#{id}
     </select>

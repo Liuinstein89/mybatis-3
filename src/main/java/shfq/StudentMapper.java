@@ -23,7 +23,7 @@ import shfq.nested_result_map.vo.Student;
  * description:
  * create date: 2016/7/11.
  */
-public interface StudentMapperTest {
+public interface StudentMapper {
 //    @Delete("delete from student where id=#{id}")
 //    int delete(Student student);
 
@@ -39,8 +39,9 @@ public interface StudentMapperTest {
 //              @Result(property = "phone", column = "phone"),
 //              @Result(property = "email", column = "email")
 //    })
-//    @Select("select name, branch, percentage, phone, email from student where id=#{id}")
-//    Student queryById(Student student);
+    @Select("select * from student where id=#{id}")
+    Student queryById(int id);
+
 }
 
 
